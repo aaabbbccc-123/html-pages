@@ -85,7 +85,7 @@
 
 
 
-      function parseCSV(tsv) {
+      function parseCSV(tsv, sectionDesc) {
         // Split lines and trim
         const lines = tsv.trim().split(/\r?\n/);
 
@@ -116,8 +116,6 @@
           if (!sections[section]) sections[section] = [];
           sections[section].push(row);
         }
-
-
 
         // Build SurveyJS pages
         const pages = [];
@@ -177,13 +175,14 @@
             if (showOtherItem) element.showOtherItem = true;
             elements.push(element);
           });
+          console.log(sectionDesc);
           pages.push({
             name: section,
             title: section,
+            description: sectionDesc[section] !== undefined ? sectionDesc[section] : '',
             elements,
           });
         });
-        console.log(pages);
         return {
           showQuestionNumbers: 'on',
           pages,
@@ -209,31 +208,148 @@
           }
         }, [json]);
 
-
         return React.createElement('div', { className: 'surveyjs-container' },
           React.createElement('div', { ref: surveyContainerRef })
+        );
+      }
+      // Tab component for switching between tabs
+      function Tabs({ tabs, activeTab, onTabChange }) {
+        return React.createElement(
+          'div',
+          { className: 'tabs', style: { marginBottom: 16, display: 'flex', gap: 8 } },
+          tabs.map((tab, idx) =>
+            React.createElement(
+              'button',
+              {
+                key: tab,
+                onClick: () => onTabChange(idx),
+                style: {
+                  padding: '8px 16px',
+                  border: '1px solid #ccc',
+                  background: idx === activeTab ? '#e9ecef' : '#fff',
+                  cursor: 'pointer',
+                  borderBottom: idx === activeTab ? '2px solid #007bff' : '1px solid #ccc',
+                  fontWeight: idx === activeTab ? 'bold' : 'normal'
+                }
+              },
+              tab
+            )
+          )
+        );
+      }
+    // Implement getSections: parses multilineInput (CSV) and returns array of { name, description }
+        function getSections(input) {
+            // Split input into lines, filter out empty lines
+            const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
+            if (lines.length === 0) return [];
+            // Assume first line is header
+            const nameIdx = 1
+            // Collect unique sections
+            const seen = new Set();
+            const sections = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split('\t').map(c => c.trim());
+                const name = cols[nameIdx];
+                if (!name || seen.has(name)) continue;
+                seen.add(name);
+                sections.push( name);
+            }
+            console.log(sections);
+            return sections;
+        }
+      // Table to display sections and their descriptions
+      function SectionTable({ sections, sectionDesc, setSectionDesc }) {
+        // sections: array of section name (string)
+        // sectionDesc: { [sectionName]: description }
+        // setSectionDesc: function to update sectionDesc
+
+        // Handler for description change
+        function handleDescChange(sectionName, value) {
+          setSectionDesc({
+            ...sectionDesc,
+            [sectionName]: value
+          });
+        }
+
+        return React.createElement(
+          'table',
+          { className: 'table table-bordered', style: { width: '100%', background: '#fff' } },
+          React.createElement(
+            'thead',
+            null,
+            React.createElement(
+              'tr',
+              null,
+              React.createElement('th', null, 'Section'),
+              React.createElement('th', null, 'Description')
+            )
+          ),
+          React.createElement(
+            'tbody',
+            null,
+            (sections && sections.length > 0
+              ? sections
+              : []
+            ).map((section, idx) =>
+              React.createElement(
+                'tr',
+                { key: section || idx },
+                React.createElement('td', null, section),
+                React.createElement('td', null,
+                  React.createElement('input', {
+                    type: 'text',
+                    value: sectionDesc[section] !== undefined
+                      ? sectionDesc[section]
+                      : '',
+                    onChange: e => handleDescChange(section, e.target.value),
+                    style: { width: '100%' }
+                  })
+                )
+              )
+            )
+          )
         );
       }
 
       function EtiFormViewer() {
         const [multilineInput, setMultilineInput] = useState('');
-
+        const [activeTab, setActiveTab] = useState(0);
+        const [sectionDesc, setSectionDesc] = useState({});
         return React.createElement('div', null,
           React.createElement('h1', null, 'ETI Form Viewer'),
           React.createElement('div', { style: { marginBottom: 32 } },
-            React.createElement('label', null,
-              React.createElement('strong', null, 'Multiline Input:'),
-              React.createElement('br'),
-              React.createElement('textarea', {
-                value: multilineInput,
-                onChange: e => setMultilineInput(e.target.value),
-                placeholder: 'Enter your text here...'
-              })
+            React.createElement(Tabs, {
+              tabs: ['Questions', 'Sections'],
+              activeTab,
+              onTabChange: (tab) => setActiveTab(tab)
+            }),
+            activeTab === 0 && React.createElement('div', { style: { marginTop: 16 } },
+              React.createElement('label', null,
+                React.createElement('strong', null, 'Multiline Input:'),
+                React.createElement('br'),
+                React.createElement('textarea', {
+                  value: multilineInput,
+                  onChange: e => setMultilineInput(e.target.value),
+                  placeholder: 'Enter your text here...'
+                })
+              )
+            ),
+            activeTab === 1 && React.createElement('div', { style: { marginTop: 16 } },
+              React.createElement(SectionTable, { sections: (() => {
+                try {
+                  return multilineInput ? getSections(multilineInput) : null;
+                } catch (e) {
+                  return null;
+                }
+              })(),
+              sectionDesc,
+              setSectionDesc
+            })
             ),
             React.createElement(SurveyJSRender, {
               json: (() => {
                 try {
-                  return multilineInput ? parseCSV(multilineInput) : null;
+                  return multilineInput ? parseCSV(multilineInput, sectionDesc) : null;
                 } catch (e) {
                   return null;
                 }
