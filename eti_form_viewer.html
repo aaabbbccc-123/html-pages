@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETI Form Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f7f7f7;
+      }
+      #root {
+        margin: 40px auto;
+        max-width: 1440px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 32px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 80px;
+        font-size: 16px;
+        padding: 8px;
+        margin-bottom: 24px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+      .surveyjs-container {
+        margin-top: 40px;
+        padding: 24px;
+        background: #f1f8e9;
+        border-radius: 6px;
+        min-height: 200px;
+        border: 1px solid #c5e1a5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/survey-react@1.9.124/survey.react.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/survey-react@1.9.124/survey.min.css">
+    <script type="text/javascript">
+      const { useState } = React;
+      // When radio/checkbox answer includes "none of the above", set showNoneItem and remove that answer choice
+      function processChoicesAndNoneItem(type, choices) {
+        let showNoneItem = false;
+        let processedChoices = choices;
+        if ( type === 'checkbox' && Array.isArray(choices)) {
+          // Find "none of the above" (case-insensitive, trimmed)
+          const noneIdx = choices.findIndex(
+            c => typeof c === 'string' && c.trim().toLowerCase() === 'none of the above'
+          );
+          if (noneIdx !== -1) {
+            showNoneItem = true;
+            // Remove "none of the above" from choices
+            processedChoices = choices.slice(0, noneIdx).concat(choices.slice(noneIdx + 1));
+          }
+        }
+        return { showNoneItem, choices: processedChoices };
+      }
+      // For checkbox, if "other" is present in choices, set showOtherItem and remove it from choices
+      function processChoicesAndOtherItem(type, choices) {
+        let showOtherItem = false;
+        let processedChoices = choices;
+        if ((type === 'radio' ||type === 'checkbox') && Array.isArray(choices)) {
+          // Find "other" (case-insensitive, trimmed)
+          const otherIdx = choices.findIndex(
+            c => typeof c === 'string' && c.trim().toLowerCase() === 'other'
+          );
+          if (otherIdx !== -1) {
+            showOtherItem = true;
+            // Remove "other" from choices
+            processedChoices = choices.slice(0, otherIdx).concat(choices.slice(otherIdx + 1));
+          }
+        }
+        return { showOtherItem, choices: processedChoices };
+      }
+
+
+
+      function parseCSV(tsv) {
+        // Split lines and trim
+        const lines = tsv.trim().split(/\r?\n/);
+
+        // Assume fixed column order: type, section, question, answer choice, filter (no header)
+        const getCol = (name) => {
+          const colMap = {
+            'type': 0,
+            'section': 1,
+            'question': 2,
+            'answer choice': 3,
+            'filter': 4
+          };
+          return colMap[name];
+        };
+
+        const typeIdx = getCol('type');
+        const sectionIdx = getCol('section');
+        const questionIdx = getCol('question');
+        const answerChoiceIdx = getCol('answer choice');
+        const filterIdx = getCol('filter');
+
+        // Group questions by section
+        const sections = {};
+        for (let i = 0; i < lines.length; i++) {
+          const row = lines[i].split('\t');
+
+          const section = row[sectionIdx] || 'Default';
+          if (!sections[section]) sections[section] = [];
+          sections[section].push(row);
+        }
+
+
+
+        // Build SurveyJS pages
+        const pages = [];
+        Object.entries(sections).forEach(([section, rows]) => {
+          const elements = [];
+          rows.forEach((row, idx) => {
+            const type = (row[typeIdx] || '').trim().toLowerCase();
+            // The answer value for the question in section will be answer_<question number>
+            // question number is the index of the question in the section (1-based)
+            const name = `${section}_ans_${idx + 1}`;
+            const title = row[questionIdx] || '';
+            let choices = [];
+            let showNoneItem = false;
+            let showOtherItem = false;
+            if ((type === 'radio' || type === 'checkbox') && row[answerChoiceIdx]) {
+              try {
+                choices = JSON.parse(row[answerChoiceIdx]);
+              } catch (e) {
+                choices = [];
+              }
+              ({ showNoneItem, choices } = processChoicesAndNoneItem(type, choices));
+              ({ showOtherItem, choices } = processChoicesAndOtherItem(type, choices));
+            }
+            let visibleIf = undefined;
+
+            if (row[filterIdx]) {
+              try {
+                // filter is a JSON object: { "1": "Yes", ... }
+                const filterObj = JSON.parse(row[filterIdx]);
+                // Build SurveyJS visibleIf: {answer_<qnum>} = 'Yes' and ...
+                const conds = [];
+                Object.entries(filterObj).forEach(([qnum, val]) => {
+                  // qnum is 1-based index in this section
+                  conds.push(`{${section}_ans_${qnum}} = '${val}'`);
+                });
+                if (conds.length > 0) visibleIf = conds.join(' and ');
+              } catch (e) {
+                // ignore filter if invalid
+              }
+            }
+            // Map type to SurveyJS type
+            let surveyType = 'text';
+            if (type === 'radio') surveyType = 'radiogroup';
+            else if (type === 'checkbox') surveyType = 'checkbox';
+            else if (type === 'text') surveyType = 'comment';
+            else if (type === 'dropdown') surveyType = 'dropdown';
+            else if (type === 'upload') surveyType = 'file';
+
+            const element = {
+              type: surveyType,
+              name,
+              title,
+            };
+            if (choices.length > 0) element.choices = choices;
+            if (visibleIf) element.visibleIf = visibleIf;
+            if (showNoneItem) element.showNoneItem = true;
+            if (showOtherItem) element.showOtherItem = true;
+            elements.push(element);
+          });
+          pages.push({
+            name: section,
+            title: section,
+            elements,
+          });
+        });
+        console.log(pages);
+        return {
+          showQuestionNumbers: 'on',
+          pages,
+        };
+      }
+
+      function SurveyJSRender({ json }) {
+        
+        const surveyContainerRef = React.useRef(null);
+
+        React.useEffect(() => {
+          if (surveyContainerRef.current && json) {
+            // Unmount any previous React component before rendering a new one
+            ReactDOM.unmountComponentAtNode(surveyContainerRef.current);
+
+            // Render SurveyJS React component
+            Survey.cssType = "bootstrap";
+            const survey = new Survey.Model(json);
+            ReactDOM.render(
+              React.createElement(Survey.Survey, { model: survey }),
+              surveyContainerRef.current
+            );
+          }
+        }, [json]);
+
+
+        return React.createElement('div', { className: 'surveyjs-container' },
+          React.createElement('div', { ref: surveyContainerRef })
+        );
+      }
+
+      function EtiFormViewer() {
+        const [multilineInput, setMultilineInput] = useState('');
+
+        return React.createElement('div', null,
+          React.createElement('h1', null, 'ETI Form Viewer'),
+          React.createElement('div', { style: { marginBottom: 32 } },
+            React.createElement('label', null,
+              React.createElement('strong', null, 'Multiline Input:'),
+              React.createElement('br'),
+              React.createElement('textarea', {
+                value: multilineInput,
+                onChange: e => setMultilineInput(e.target.value),
+                placeholder: 'Enter your text here...'
+              })
+            ),
+            React.createElement(SurveyJSRender, {
+              json: (() => {
+                try {
+                  return multilineInput ? parseCSV(multilineInput) : null;
+                } catch (e) {
+                  return null;
+                }
+              })()
+            })
+          ),
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(EtiFormViewer));
+    </script>
+  </body>
+</html>
+
