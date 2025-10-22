@@ -44,147 +44,218 @@
     <div id="root"></div>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/d3-dsv@3/dist/d3-dsv.min.js"></script>
     <script crossorigin src="https://unpkg.com/survey-react@1.9.124/survey.react.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/survey-react@1.9.124/survey.min.css">
     <script type="text/javascript">
       const { useState } = React;
-      // When radio/checkbox answer includes "none of the above", set showNoneItem and remove that answer choice
-      function processChoicesAndNoneItem(type, choices) {
+      function extractNone(choices, surveyType) {
         let showNoneItem = false;
-        let processedChoices = choices;
-        if ( type === 'checkbox' && Array.isArray(choices)) {
-          // Find "none of the above" (case-insensitive, trimmed)
+        let processedChoices = [...choices];
+        
+        if (surveyType === 'checkbox' && Array.isArray(choices)) {
           const noneIdx = choices.findIndex(
             c => typeof c === 'string' && c.trim().toLowerCase() === 'none of the above'
           );
           if (noneIdx !== -1) {
             showNoneItem = true;
-            // Remove "none of the above" from choices
-            processedChoices = choices.slice(0, noneIdx).concat(choices.slice(noneIdx + 1));
+            processedChoices.splice(noneIdx, 1);
           }
         }
         return { showNoneItem, choices: processedChoices };
       }
-      // For checkbox, if "other" is present in choices, set showOtherItem and remove it from choices
-      function processChoicesAndOtherItem(type, choices) {
+      
+      // Extract "Other" - matches backend extractOther logic
+      function extractOther(choices, surveyType) {
         let showOtherItem = false;
-        let processedChoices = choices;
-        if ((type === 'radio' ||type === 'checkbox') && Array.isArray(choices)) {
-          // Find "other" (case-insensitive, trimmed)
+        let processedChoices = [...choices];
+        
+        if ((surveyType === 'radiogroup' || surveyType === 'checkbox') && Array.isArray(choices)) {
           const otherIdx = choices.findIndex(
             c => typeof c === 'string' && c.trim().toLowerCase() === 'other'
           );
           if (otherIdx !== -1) {
             showOtherItem = true;
-            // Remove "other" from choices
-            processedChoices = choices.slice(0, otherIdx).concat(choices.slice(otherIdx + 1));
+            processedChoices.splice(otherIdx, 1);
           }
         }
         return { showOtherItem, choices: processedChoices };
       }
-
-
-
-      function parseCSV(tsv, sectionDesc) {
-        // Split lines and trim
-        const lines = tsv.trim().split(/\r?\n/);
-
-        // Assume fixed column order: type, section, question, answer choice, filter (no header)
-        const getCol = (name) => {
-          const colMap = {
-            'type': 0,
-            'section': 1,
-            'question': 2,
-            'answer choice': 3,
-            'filter': 4
-          };
-          return colMap[name];
+      
+      // Map ETI question type to SurveyJS type - matches backend mapToSurveyJSQuestionType
+      function mapToSurveyJSQuestionType(etiType) {
+        const typeMap = {
+          'text': 'comment',
+          'optional_text': 'comment',
+          'radio': 'radiogroup',
+          'checkbox': 'checkbox',
+          'attachment': 'file'
         };
+        return typeMap[etiType] || 'comment';
+      }
 
-        const typeIdx = getCol('type');
-        const sectionIdx = getCol('section');
-        const questionIdx = getCol('question');
-        const answerChoiceIdx = getCol('answer choice');
-        const filterIdx = getCol('filter');
 
-        // Group questions by section
-        const sections = {};
-        for (let i = 0; i < lines.length; i++) {
-          const row = lines[i].split('\t');
 
-          const section = row[sectionIdx] || 'Default';
-          if (!sections[section]) sections[section] = [];
-          sections[section].push(row);
+      function parseTSV(tsvText, sectionDesc) {
+        if (!tsvText || !tsvText.trim()) return null;
+        
+        const rows = d3.tsvParseRows(tsvText.trim());
+        if (rows.length === 0) return null;
+
+        // Column indices (fixed order)
+        const typeIdx = 0;
+        const sectionIdx = 1;
+        const questionIdx = 2;
+        const optionsIdx = 3;
+        const filterIdx = 4;
+
+        // Group questions by section - matches backend logic
+        const grouped = {};
+        
+        for (const row of rows) {
+          const section = row[sectionIdx] || 'General';
+          
+          if (!grouped[section]) {
+            grouped[section] = [];
+          }
+          
+          // Parse question data
+          const questionType = (row[typeIdx] || '').trim().toLowerCase();
+          const question = row[questionIdx] || '';
+          let options = [];
+          let filter = null;
+          
+          // Parse options for radio/checkbox
+          if ((questionType === 'radio' || questionType === 'checkbox') && row[optionsIdx]) {
+            try {
+              options = JSON.parse(row[optionsIdx]);
+            } catch (e) {
+              console.warn('Failed to parse options:', row[optionsIdx], e);
+              options = [];
+            }
+          }
+          
+          // Parse filter
+          if (row[filterIdx]) {
+            try {
+              filter = JSON.parse(row[filterIdx]);
+            } catch (e) {
+              console.warn('Failed to parse filter:', row[filterIdx], e);
+              filter = null;
+            }
+          }
+          
+          grouped[section].push({
+            question,
+            questionType,
+            options,
+            filter
+          });
         }
 
-        // Build SurveyJS pages
-        const pages = [];
-        Object.entries(sections).forEach(([section, rows]) => {
-          const elements = [];
-          rows.forEach((row, idx) => {
-            const type = (row[typeIdx] || '').trim().toLowerCase();
-            // The answer value for the question in section will be answer_<question number>
-            // question number is the index of the question in the section (1-based)
-            const name = `${section}_ans_${idx + 1}`;
-            const title = row[questionIdx] || '';
-            let choices = [];
-            let showNoneItem = false;
+        // Build SurveyJS pages - MATCHES BACKEND EXACTLY
+        const pages = Object.entries(grouped).map(([section, questions]) => {
+          const elements = questions.map((q, i) => {
+            const { question, questionType, options, filter } = q;
+            
+            // Map to SurveyJS type using helper
+            const surveyType = mapToSurveyJSQuestionType(questionType);
+            const localIdx = i + 1; // 1-based index within section
+            const name = `${section}_q${localIdx}`; // MATCHES BACKEND FORMAT
+            const title = question;
+            
+            let choices = Array.isArray(options) ? [...options] : [];
             let showOtherItem = false;
-            if ((type === 'radio' || type === 'checkbox') && row[answerChoiceIdx]) {
-              try {
-                choices = JSON.parse(row[answerChoiceIdx]);
-              } catch (e) {
-                choices = [];
-              }
-              ({ showNoneItem, choices } = processChoicesAndNoneItem(type, choices));
-              ({ showOtherItem, choices } = processChoicesAndOtherItem(type, choices));
-            }
+            let showNoneItem = false;
+            
+            // Extract Other and None - MATCHES BACKEND ORDER
+            ({ choices, showOtherItem } = extractOther(choices, surveyType));
+            ({ choices, showNoneItem } = extractNone(choices, surveyType));
+            
             let visibleIf = undefined;
-
-            if (row[filterIdx]) {
-              try {
-                // filter is a JSON object: { "1": "Yes", ... }
-                const filterObj = JSON.parse(row[filterIdx]);
-                // Build SurveyJS visibleIf: {answer_<qnum>} = 'Yes' and ...
-                const conds = [];
-                Object.entries(filterObj).forEach(([qnum, val]) => {
-                  // qnum is 1-based index in this section
-                  conds.push(`{${section}_ans_${qnum}} = '${val}'`);
-                });
-                if (conds.length > 0) visibleIf = conds.join(' and ');
-              } catch (e) {
-                // ignore filter if invalid
+            
+            // Build filter conditions - MATCHES BACKEND LOGIC
+            if (filter && typeof filter === 'object') {
+              const conds = [];
+              
+              for (const [dependsKey, expected] of Object.entries(filter)) {
+                const questionNum = Number(dependsKey);
+                
+                if (!isNaN(questionNum) && questionNum >= 1 && questionNum <= questions.length) {
+                  const ref = `{${section}_q${questionNum}}`;
+                  const dependencyQuestion = questions[questionNum - 1];
+                  const dependencyType = dependencyQuestion?.questionType;
+                  const isCheckboxDependency = dependencyType === 'checkbox';
+                  
+                  // Build condition based on dependency type
+                  const buildCondition = (value) =>
+                    isCheckboxDependency 
+                      ? `${ref} contains '${value}'` 
+                      : `${ref} = '${value}'`;
+                  
+                  if (Array.isArray(expected)) {
+                    const condition = expected.map(v => buildCondition(v)).join(' or ');
+                    conds.push(condition);
+                  } else {
+                    conds.push(buildCondition(expected));
+                  }
+                }
+              }
+              
+              if (conds.length) {
+                visibleIf = conds.join(' and ');
               }
             }
-            // Map type to SurveyJS type
-            let surveyType = 'text';
-            if (type === 'radio') surveyType = 'radiogroup';
-            else if (type === 'checkbox') surveyType = 'checkbox';
-            else if (type === 'text') surveyType = 'comment';
-            else if (type === 'dropdown') surveyType = 'dropdown';
-            else if (type === 'upload') surveyType = 'file';
-
-            const element = {
+            
+            // Build element - MATCHES BACKEND
+            const el = {
               type: surveyType,
               name,
               title,
             };
-            if (choices.length > 0) element.choices = choices;
-            if (visibleIf) element.visibleIf = visibleIf;
-            if (showNoneItem) element.showNoneItem = true;
-            if (showOtherItem) element.showOtherItem = true;
-            elements.push(element);
+            
+            if (choices.length) {
+              el.choices = choices;
+            }
+            if (visibleIf) {
+              el.visibleIf = visibleIf;
+            }
+            if (showOtherItem) {
+              el.showOtherItem = true;
+            }
+            if (showNoneItem) {
+              el.showNoneItem = true;
+              el.noneText = 'None of the above';
+            }
+            if (questionType !== 'optional_text') {
+              el.isRequired = true;
+            }
+            
+            // Attachment/file configuration - MATCHES BACKEND
+            if (questionType === 'attachment') {
+              el.storeDataAsText = false;
+              el.waitForUpload = true;
+              el.maxSize = 10 * 1024 * 1024; // 10MB
+              el.acceptedTypes = 'application/pdf, image/jpeg, image/png, image/jpg';
+              el.allowMultiple = true;
+              el.maxFilesCount = 3;
+            }
+            
+            return el;
           });
-          console.log(sectionDesc);
-          pages.push({
+          
+          return {
             name: section,
             title: section,
-            description: sectionDesc[section] !== undefined ? sectionDesc[section] : '',
+            description: sectionDesc[section] || '',
             elements,
-          });
+          };
         });
+        
+        // Return SurveyJS schema - MATCHES BACKEND
         return {
           showQuestionNumbers: 'on',
+          showProgressBar: 'top',
           pages,
         };
       }
@@ -237,24 +308,27 @@
           )
         );
       }
-    // Implement getSections: parses multilineInput (CSV) and returns array of { name, description }
-        function getSections(input) {
-            // Split input into lines, filter out empty lines
-            const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
-            if (lines.length === 0) return [];
-            // Assume first line is header
-            const nameIdx = 1
-            // Collect unique sections
+    // Implement getSections: parses TSV input and returns array of unique section names
+        function getSections(tsvText) {
+            if (!tsvText || !tsvText.trim()) return [];
+            
+            // Use d3.tsvParseRows for robust parsing
+            const rows = d3.tsvParseRows(tsvText.trim());
+            if (rows.length === 0) return [];
+            
+            const sectionIdx = 1; // Section is 2nd column
+            
+            // Collect unique sections in order
             const seen = new Set();
             const sections = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split('\t').map(c => c.trim());
-                const name = cols[nameIdx];
+            
+            for (const row of rows) {
+                const name = row[sectionIdx];
                 if (!name || seen.has(name)) continue;
                 seen.add(name);
-                sections.push( name);
+                sections.push(name);
             }
-            console.log(sections);
+            
             return sections;
         }
       // Table to display sections and their descriptions
@@ -325,8 +399,7 @@
             }),
             activeTab === 0 && React.createElement('div', { style: { marginTop: 16 } },
               React.createElement('label', null,
-                React.createElement('strong', null, 'Multiline Input:'),
-                React.createElement('br'),
+                React.createElement('strong', {style: { display: 'block', marginBottom: 10}}, 'Multiline Input:'),
                 React.createElement('textarea', {
                   value: multilineInput,
                   onChange: e => setMultilineInput(e.target.value),
@@ -349,8 +422,9 @@
             React.createElement(SurveyJSRender, {
               json: (() => {
                 try {
-                  return multilineInput ? parseCSV(multilineInput, sectionDesc) : null;
+                  return multilineInput ? parseTSV(multilineInput, sectionDesc) : null;
                 } catch (e) {
+                  console.error('Error parsing TSV:', e);
                   return null;
                 }
               })()
@@ -364,4 +438,3 @@
     </script>
   </body>
 </html>
-
