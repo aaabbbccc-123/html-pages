@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuckDB Console</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 14px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 { font-size: 16px; color: #89b4fa; font-weight: 600; }
+
+    #status {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #313244;
+      color: #a6adc8;
+    }
+    #status.ready { background: #a6e3a1; color: #1e1e2e; }
+    #status.error  { background: #f38ba8; color: #1e1e2e; }
+    #status.busy   { background: #fab387; color: #1e1e2e; }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    #history {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .entry { display: flex; flex-direction: column; gap: 6px; }
+
+    .entry-sql {
+      color: #89dceb;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .entry-sql::before { content: '> '; color: #6c7086; }
+
+    .entry-time { font-size: 11px; color: #6c7086; }
+
+    .entry-error {
+      color: #f38ba8;
+      white-space: pre-wrap;
+    }
+
+    .results-table-wrap { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: max-content;
+      min-width: 100%;
+      font-size: 13px;
+    }
+
+    thead { background: #313244; }
+
+    th {
+      padding: 6px 14px;
+      text-align: left;
+      color: #cba6f7;
+      border-bottom: 1px solid #45475a;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 5px 14px;
+      border-bottom: 1px solid #2a2a3d;
+      white-space: nowrap;
+      color: #cdd6f4;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #2a2a3d; }
+
+    .null-val { color: #6c7086; font-style: italic; }
+
+    /* ── File panel ── */
+    #file-panel {
+      background: #181825;
+      border: 1px solid #313244;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #file-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      color: #a6adc8;
+    }
+    #file-panel-header:hover { background: #1e1e2e; }
+    #file-panel-header .chevron { transition: transform 0.2s; font-style: normal; }
+    #file-panel.open .chevron { transform: rotate(90deg); }
+
+    #file-panel-body { display: none; padding: 10px 12px; border-top: 1px solid #313244; }
+    #file-panel.open #file-panel-body { display: block; }
+
+    #drop-zone {
+      border: 2px dashed #45475a;
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+      font-size: 12px;
+      color: #6c7086;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    #drop-zone:hover, #drop-zone.drag-over {
+      border-color: #89b4fa;
+      background: #1e1e2e;
+      color: #cdd6f4;
+    }
+
+    #file-input { display: none; }
+
+    #file-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .file-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #313244;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    .file-tag-name { color: #a6e3a1; flex: 1; }
+    .file-tag-hint { color: #6c7086; font-size: 11px; }
+    .file-tag-remove {
+      color: #f38ba8;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .file-tag-remove:hover { color: #ff8fa3; }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      background: #181825;
+      border: 1px solid #313244;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    #sql-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #cdd6f4;
+      font-family: inherit;
+      font-size: 14px;
+      resize: none;
+      min-height: 60px;
+      max-height: 200px;
+      line-height: 1.5;
+    }
+    #sql-input::placeholder { color: #45475a; }
+
+    .btn {
+      background: #89b4fa;
+      color: #1e1e2e;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #b4d0fb; }
+    .btn:disabled { background: #45475a; color: #6c7086; cursor: not-allowed; }
+
+    .hint {
+      font-size: 11px;
+      color: #45475a;
+      padding: 4px 0 0 4px;
+    }
+
+    .empty-state {
+      color: #45475a;
+      text-align: center;
+      padding: 40px;
+      font-size: 13px;
+    }
+
+    .example-queries {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      justify-content: center;
+    }
+
+    .example-btn {
+      background: #313244;
+      color: #89b4fa;
+      border: 1px solid #45475a;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .example-btn:hover { background: #45475a; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1e1e2e; }
+    ::-webkit-scrollbar-thumb { background: #45475a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #585b70; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🦆 DuckDB Console</h1>
+  <span id="status">Loading…</span>
+</header>
+
+<main>
+  <div id="history">
+    <div class="empty-state" id="empty-msg">
+      DuckDB WASM is loading…
+      <div class="example-queries" id="examples" style="display:none">
+        <button class="example-btn" onclick="setExample(&quot;SELECT 42 AS answer, 'hello' AS greeting;&quot;)">SELECT 42</button>
+        <button class="example-btn" onclick="setExample(&quot;SELECT * FROM range(10) t(n);&quot;)">range(10)</button>
+        <button class="example-btn" onclick="setExample(&quot;SELECT now() AS current_time;&quot;)">now()</button>
+        <button class="example-btn" onclick="setExample(&quot;SUMMARIZE SELECT * FROM range(100) t(n);&quot;)">SUMMARIZE</button>
+        <button class="example-btn" onclick="setExample(&quot;SELECT version();&quot;)">version()</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- File panel -->
+  <div id="file-panel" class="open">
+    <div id="file-panel-header" onclick="toggleFilePanel()">
+      <em class="chevron">▶</em>
+      <span>Local files</span>
+      <span id="file-count" style="color:#6c7086"></span>
+    </div>
+    <div id="file-panel-body">
+      <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+        Drop <code>.parquet</code>, <code>.csv</code>, <code>.json</code> files here, or click to browse
+      </div>
+      <input type="file" id="file-input" multiple accept=".parquet,.csv,.json,.tsv,.arrow">
+      <div id="file-list"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="input-row">
+      <textarea id="sql-input" placeholder="Enter SQL…  (Ctrl+Enter to run)" spellcheck="false" disabled></textarea>
+      <button class="btn" id="run-btn" onclick="runQuery()" disabled>Run</button>
+    </div>
+    <div class="hint">
+      Ctrl+Enter / Cmd+Enter to run &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp;
+      <code>file:///path/to/file.parquet</code> paths are auto-resolved to loaded files
+    </div>
+  </div>
+</main>
+
+<script type="importmap">
+{
+  "imports": {
+    "apache-arrow": "https://esm.sh/apache-arrow",
+    "apache-arrow/": "https://esm.sh/apache-arrow/"
+  }
+}
+</script>
+
+<script type="module">
+  const CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@latest/dist/';
+
+  const BUNDLES = {
+    mvp: {
+      mainModule: CDN + 'duckdb-mvp.wasm',
+      mainWorker: CDN + 'duckdb-browser-mvp.worker.js',
+    },
+    eh: {
+      mainModule: CDN + 'duckdb-eh.wasm',
+      mainWorker: CDN + 'duckdb-browser-eh.worker.js',
+    },
+  };
+
+  const statusEl  = document.getElementById('status');
+  const historyEl = document.getElementById('history');
+  const emptyMsg  = document.getElementById('empty-msg');
+  const examples  = document.getElementById('examples');
+  const input     = document.getElementById('sql-input');
+  const runBtn    = document.getElementById('run-btn');
+  const fileList  = document.getElementById('file-list');
+  const fileCount = document.getElementById('file-count');
+  const dropZone  = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+
+  let db, conn, duckdbMod;
+  // Maps registered virtual name → true
+  const registeredFiles = new Map();
+
+  function setStatus(text, cls) {
+    statusEl.textContent = text;
+    statusEl.className = cls || '';
+  }
+
+  // ── File loading ─────────────────────────────────────────────────────────
+
+  async function loadFile(file) {
+    if (!db) return;
+    const name = file.name;
+    // Re-register if already present (allows replacing a file)
+    await db.registerFileHandle(
+      name,
+      file,
+      duckdbMod.DuckDBDataProtocol.BROWSER_FILEREADER,
+      true
+    );
+    registeredFiles.set(name, true);
+    renderFileList();
+  }
+
+  function removeFile(name) {
+    registeredFiles.delete(name);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const names = [...registeredFiles.keys()];
+    fileCount.textContent = names.length ? `(${names.length})` : '';
+    fileList.innerHTML = '';
+    names.forEach(name => {
+      const tag = document.createElement('div');
+      tag.className = 'file-tag';
+      tag.innerHTML = `
+        <span class="file-tag-name">${name}</span>
+        <span class="file-tag-hint">query as <code>'${name}'</code></span>
+        <button class="file-tag-remove" title="Remove">×</button>
+      `;
+      tag.querySelector('.file-tag-remove').addEventListener('click', () => removeFile(name));
+      fileList.appendChild(tag);
+    });
+  }
+
+  async function handleFiles(files) {
+    for (const file of files) {
+      await loadFile(file);
+    }
+  }
+
+  // Drag & drop
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    handleFiles([...e.dataTransfer.files]);
+  });
+
+  fileInput.addEventListener('change', () => {
+    handleFiles([...fileInput.files]);
+    fileInput.value = '';
+  });
+
+  // ── SQL preprocessing ─────────────────────────────────────────────────────
+  // Rewrites 'file:///any/path/to/filename.ext' → 'filename.ext'
+  // so queries like: SELECT * FROM 'file:///Users/haitao/result.parquet'
+  // transparently use the registered file.
+  function preprocessSQL(sql) {
+    return sql.replace(/'file:\/\/\/(?:[^']*\/)?([^'/]+)'/g, (match, basename) => {
+      if (registeredFiles.has(basename)) return `'${basename}'`;
+      // Not loaded yet — leave as-is so DuckDB gives a clear error
+      return match;
+    });
+  }
+
+  // ── Query runner ──────────────────────────────────────────────────────────
+
+  async function runQuery() {
+    const rawSQL = input.value.trim();
+    if (!rawSQL || !conn) return;
+
+    const sql = preprocessSQL(rawSQL);
+
+    runBtn.disabled = true;
+    setStatus('Running…', 'busy');
+
+    const entry = document.createElement('div');
+    entry.className = 'entry';
+    const sqlDiv = document.createElement('div');
+    sqlDiv.className = 'entry-sql';
+    // Show the original SQL the user typed
+    sqlDiv.textContent = rawSQL;
+    entry.appendChild(sqlDiv);
+
+    document.getElementById('empty-msg')?.remove();
+
+    const t0 = performance.now();
+    try {
+      const result = await conn.query(sql);
+      const elapsed = (performance.now() - t0).toFixed(1);
+
+      const schema = result.schema.fields;
+      const batches = result.batches;
+
+      const rows = [];
+      for (const batch of batches) {
+        for (let i = 0; i < batch.numRows; i++) {
+          const row = {};
+          schema.forEach((f, ci) => {
+            const col = batch.getChildAt(ci);
+            row[f.name] = col ? col.get(i) : null;
+          });
+          rows.push(row);
+        }
+      }
+
+      const timeDiv = document.createElement('div');
+      timeDiv.className = 'entry-time';
+      timeDiv.textContent = `${rows.length} row${rows.length !== 1 ? 's' : ''} · ${elapsed} ms`;
+
+      if (schema.length === 0 || rows.length === 0) {
+        entry.appendChild(timeDiv);
+      } else {
+        const wrap = document.createElement('div');
+        wrap.className = 'results-table-wrap';
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+
+        const headerRow = document.createElement('tr');
+        schema.forEach(f => {
+          const th = document.createElement('th');
+          th.textContent = f.name;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+          schema.forEach(f => {
+            const td = document.createElement('td');
+            const v = row[f.name];
+            if (v === null || v === undefined) {
+              td.innerHTML = '<span class="null-val">NULL</span>';
+            } else if (typeof v === 'bigint') {
+              td.textContent = v.toString();
+            } else {
+              td.textContent = String(v);
+            }
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        entry.appendChild(wrap);
+        entry.appendChild(timeDiv);
+      }
+
+      setStatus('Ready', 'ready');
+    } catch (err) {
+      const errDiv = document.createElement('div');
+      errDiv.className = 'entry-error';
+      // If the error mentions the file path, add a helpful hint
+      let msg = err.message;
+      const filePathMatch = rawSQL.match(/'file:\/\/\/(?:[^']*\/)?([^'/]+)'/);
+      if (filePathMatch && !registeredFiles.has(filePathMatch[1])) {
+        msg += `\n\nHint: load "${filePathMatch[1]}" via the Local files panel above first.`;
+      }
+      errDiv.textContent = msg;
+      entry.appendChild(errDiv);
+      setStatus('Ready', 'ready');
+    }
+
+    historyEl.appendChild(entry);
+    historyEl.scrollTop = historyEl.scrollHeight;
+    runBtn.disabled = false;
+    input.value = '';
+    input.focus();
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+
+  async function init() {
+    try {
+      duckdbMod = await import(CDN + 'duckdb-browser.mjs');
+      const bundle = await duckdbMod.selectBundle(BUNDLES);
+      const workerResp = await fetch(bundle.mainWorker);
+      const workerBlob = await workerResp.blob();
+      const workerUrl  = URL.createObjectURL(workerBlob);
+      const worker = new Worker(workerUrl);
+      const logger = new duckdbMod.ConsoleLogger(duckdbMod.LogLevel.WARNING);
+      db = new duckdbMod.AsyncDuckDB(logger, worker);
+      await db.instantiate(bundle.mainModule);
+      conn = await db.connect();
+
+      setStatus('Ready', 'ready');
+      emptyMsg.innerHTML = 'Run a query to see results.';
+      examples.style.display = 'flex';
+
+      input.disabled = false;
+      runBtn.disabled = false;
+      input.focus();
+    } catch (err) {
+      setStatus('Error', 'error');
+      emptyMsg.textContent = 'Failed to load DuckDB: ' + err.message;
+      console.error(err);
+    }
+  }
+
+  input.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runQuery();
+    }
+  });
+
+  window.runQuery   = runQuery;
+  window.setExample = sql => { input.value = sql; input.focus(); };
+  window.toggleFilePanel = () => {
+    document.getElementById('file-panel').classList.toggle('open');
+  };
+
+  init();
+</script>
+
+</body>
+</html>
