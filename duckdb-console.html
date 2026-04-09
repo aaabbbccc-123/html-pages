@@ -194,12 +194,156 @@
       color: #cdd6f4;
       font-family: inherit;
       font-size: 14px;
-      resize: none;
+      resize: vertical;
       min-height: 60px;
-      max-height: 200px;
+      height: 100px;
       line-height: 1.5;
     }
     #sql-input::placeholder { color: #45475a; }
+
+    #history-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hist-btn {
+      background: #313244;
+      color: #a6adc8;
+      border: 1px solid #45475a;
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .hist-btn:hover:not(:disabled) { background: #45475a; color: #cdd6f4; }
+    .hist-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #hist-pos { font-size: 11px; color: #6c7086; min-width: 40px; text-align: center; }
+
+    /* ── History modal ── */
+    #hist-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    #hist-modal-backdrop.open { display: flex; }
+
+    #hist-modal {
+      background: #1e1e2e;
+      border: 1px solid #313244;
+      border-radius: 12px 12px 0 0;
+      width: 100%;
+      max-width: 860px;
+      max-height: 65vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #hist-modal-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #313244;
+      gap: 8px;
+    }
+    #hist-modal-header h2 { font-size: 14px; color: #cba6f7; font-weight: 600; flex: 1; }
+
+    #hist-search {
+      background: #181825;
+      border: 1px solid #45475a;
+      border-radius: 6px;
+      color: #cdd6f4;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 5px 10px;
+      outline: none;
+      width: 200px;
+    }
+    #hist-search::placeholder { color: #45475a; }
+    #hist-search:focus { border-color: #89b4fa; }
+
+    #hist-clear-all {
+      background: none;
+      border: 1px solid #f38ba8;
+      color: #f38ba8;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #hist-clear-all:hover { background: #f38ba822; }
+
+    #hist-close {
+      background: none;
+      border: none;
+      color: #6c7086;
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    #hist-close:hover { color: #cdd6f4; }
+
+    #hist-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 0;
+    }
+
+    .hist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #181825;
+      transition: background 0.1s;
+    }
+    .hist-item:hover { background: #313244; }
+    .hist-item:hover .hist-item-del { opacity: 1; }
+
+    .hist-item-num { color: #6c7086; font-size: 11px; min-width: 28px; padding-top: 2px; text-align: right; }
+    .hist-item-sql {
+      flex: 1;
+      color: #89dceb;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+    .hist-item-del {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: #f38ba8;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+
+    #hist-empty {
+      color: #45475a;
+      text-align: center;
+      padding: 32px;
+      font-size: 13px;
+    }
 
     .btn {
       background: #89b4fa;
@@ -297,14 +441,35 @@
   <div>
     <div class="input-row">
       <textarea id="sql-input" placeholder="Enter SQL…  (Ctrl+Enter to run)" spellcheck="false" disabled></textarea>
-      <button class="btn" id="run-btn" onclick="runQuery()" disabled>Run</button>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">
+        <button class="btn" id="run-btn" onclick="runQuery()" disabled>Run</button>
+        <div id="history-nav">
+          <button class="hist-btn" id="hist-up" title="Previous query (↑)" disabled>↑</button>
+          <span id="hist-pos"></span>
+          <button class="hist-btn" id="hist-down" title="Next query (↓)" disabled>↓</button>
+          <button class="hist-btn" id="hist-show-btn" title="Show all history" style="width:auto;padding:0 6px;font-size:12px;">⏱</button>
+        </div>
+      </div>
     </div>
     <div class="hint">
-      Ctrl+Enter / Cmd+Enter to run &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp;
+      Ctrl+Enter / Cmd+Enter to run &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; ↑↓ history &nbsp;·&nbsp;
       <code>file:///path/to/file.parquet</code> paths are auto-resolved to loaded files
     </div>
   </div>
 </main>
+
+<!-- History modal -->
+<div id="hist-modal-backdrop">
+  <div id="hist-modal">
+    <div id="hist-modal-header">
+      <h2>SQL History</h2>
+      <input id="hist-search" type="text" placeholder="Filter…" autocomplete="off">
+      <button id="hist-clear-all">Clear all</button>
+      <button id="hist-close">×</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+</div>
 
 <script type="importmap">
 {
@@ -343,6 +508,150 @@
   let db, conn, duckdbMod;
   // Maps registered virtual name → true
   const registeredFiles = new Map();
+
+  // ── SQL History ──────────────────────────────────────────────────────────
+  const HISTORY_KEY = 'duckdb-console-sql-history';
+  const MAX_HISTORY = 200;
+
+  let sqlHistory = (() => {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+    catch { return []; }
+  })();
+  let histIdx = sqlHistory.length; // points past the end = "new input"
+  let draftSQL = '';               // saved draft when navigating back
+
+  const histUp   = document.getElementById('hist-up');
+  const histDown = document.getElementById('hist-down');
+  const histPos  = document.getElementById('hist-pos');
+
+  function saveHistory(sql) {
+    // Avoid consecutive duplicates
+    if (sqlHistory[sqlHistory.length - 1] !== sql) {
+      sqlHistory.push(sql);
+      if (sqlHistory.length > MAX_HISTORY) sqlHistory.shift();
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(sqlHistory)); }
+      catch {}
+    }
+    histIdx = sqlHistory.length;
+    draftSQL = '';
+    updateHistNav();
+  }
+
+  function updateHistNav() {
+    histUp.disabled   = sqlHistory.length === 0 || histIdx === 0;
+    histDown.disabled = histIdx >= sqlHistory.length;
+    histPos.textContent = sqlHistory.length
+      ? `${histIdx < sqlHistory.length ? histIdx + 1 : '–'}/${sqlHistory.length}`
+      : '';
+  }
+
+  function navigateHistory(dir) {
+    if (!sqlHistory.length) return;
+    if (dir === -1) { // up / older
+      if (histIdx === sqlHistory.length) draftSQL = input.value;
+      if (histIdx > 0) histIdx--;
+      input.value = sqlHistory[histIdx];
+    } else {          // down / newer
+      if (histIdx < sqlHistory.length - 1) { histIdx++; input.value = sqlHistory[histIdx]; }
+      else { histIdx = sqlHistory.length; input.value = draftSQL; }
+    }
+    updateHistNav();
+    // Move cursor to end
+    input.selectionStart = input.selectionEnd = input.value.length;
+  }
+
+  histUp.addEventListener('click',   () => navigateHistory(-1));
+  histDown.addEventListener('click', () => navigateHistory(1));
+  updateHistNav();
+
+  // ── History modal ─────────────────────────────────────────────────────────
+  const histShowBtn  = document.getElementById('hist-show-btn');
+  const histBackdrop = document.getElementById('hist-modal-backdrop');
+  const histListEl   = document.getElementById('hist-list');
+  const histSearch   = document.getElementById('hist-search');
+
+  function renderHistModal(filter = '') {
+    histListEl.innerHTML = '';
+    const q = filter.trim().toLowerCase();
+    const items = [...sqlHistory].reverse(); // newest first
+    const filtered = q ? items.filter(s => s.toLowerCase().includes(q)) : items;
+
+    if (!filtered.length) {
+      const empty = document.createElement('div');
+      empty.id = 'hist-empty';
+      empty.textContent = q ? 'No matching queries.' : 'No history yet.';
+      histListEl.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((sql, i) => {
+      const globalIdx = sqlHistory.length - 1 - sqlHistory.slice().reverse().indexOf(sql, i); // actual index
+      const row = document.createElement('div');
+      row.className = 'hist-item';
+
+      const num = document.createElement('span');
+      num.className = 'hist-item-num';
+      num.textContent = sqlHistory.length - i;
+
+      const code = document.createElement('pre');
+      code.className = 'hist-item-sql';
+      code.textContent = sql;
+
+      const del = document.createElement('button');
+      del.className = 'hist-item-del';
+      del.title = 'Remove';
+      del.textContent = '×';
+      del.addEventListener('click', e => {
+        e.stopPropagation();
+        const realIdx = sqlHistory.lastIndexOf(sql);
+        if (realIdx !== -1) sqlHistory.splice(realIdx, 1);
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(sqlHistory)); } catch {}
+        histIdx = sqlHistory.length;
+        updateHistNav();
+        renderHistModal(histSearch.value);
+      });
+
+      row.appendChild(num);
+      row.appendChild(code);
+      row.appendChild(del);
+      row.addEventListener('click', () => {
+        input.value = sql;
+        histIdx = sqlHistory.length;
+        draftSQL = '';
+        updateHistNav();
+        closeHistModal();
+        input.focus();
+      });
+      histListEl.appendChild(row);
+    });
+  }
+
+  function openHistModal() {
+    histSearch.value = '';
+    renderHistModal();
+    histBackdrop.classList.add('open');
+    histSearch.focus();
+  }
+
+  function closeHistModal() {
+    histBackdrop.classList.remove('open');
+  }
+
+  histShowBtn.addEventListener('click', openHistModal);
+  histBackdrop.addEventListener('click', e => { if (e.target === histBackdrop) closeHistModal(); });
+  document.getElementById('hist-close').addEventListener('click', closeHistModal);
+  document.getElementById('hist-clear-all').addEventListener('click', () => {
+    if (!confirm('Clear all SQL history?')) return;
+    sqlHistory = [];
+    try { localStorage.removeItem(HISTORY_KEY); } catch {}
+    histIdx = 0; draftSQL = '';
+    updateHistNav();
+    renderHistModal();
+  });
+  histSearch.addEventListener('input', () => renderHistModal(histSearch.value));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeHistModal();
+  });
 
   function setStatus(text, cls) {
     statusEl.textContent = text;
@@ -524,6 +833,7 @@
     historyEl.appendChild(entry);
     historyEl.scrollTop = historyEl.scrollHeight;
     runBtn.disabled = false;
+    saveHistory(rawSQL);
     input.value = '';
     input.focus();
   }
@@ -549,6 +859,7 @@
 
       input.disabled = false;
       runBtn.disabled = false;
+
       input.focus();
     } catch (err) {
       setStatus('Error', 'error');
@@ -561,6 +872,22 @@
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       runQuery();
+      return;
+    }
+    // Arrow-key history: Up on first line, Down on last line
+    if (e.key === 'ArrowUp' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      const beforeCursor = input.value.slice(0, input.selectionStart);
+      if (!beforeCursor.includes('\n')) {
+        e.preventDefault();
+        navigateHistory(-1);
+      }
+    }
+    if (e.key === 'ArrowDown' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      const afterCursor = input.value.slice(input.selectionEnd);
+      if (!afterCursor.includes('\n')) {
+        e.preventDefault();
+        navigateHistory(1);
+      }
     }
   });
 
