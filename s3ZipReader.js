@@ -33,22 +33,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// fs-stub.js
-var fs_stub_exports = {};
-__export(fs_stub_exports, {
-  default: () => fs_stub_default
-});
-var fs_stub_default;
-var init_fs_stub = __esm({
-  "fs-stub.js"() {
-    fs_stub_default = {};
-  }
-});
-
 // node_modules/base64-js/index.js
 var require_base64_js = __commonJS({
   "node_modules/base64-js/index.js"(exports) {
     "use strict";
+    init_buffer_global();
     exports.byteLength = byteLength;
     exports.toByteArray = toByteArray;
     exports.fromByteArray = fromByteArray;
@@ -149,6 +138,7 @@ var require_base64_js = __commonJS({
 // node_modules/ieee754/index.js
 var require_ieee754 = __commonJS({
   "node_modules/ieee754/index.js"(exports) {
+    init_buffer_global();
     exports.read = function(buffer, offset, isLE, mLen, nBytes) {
       var e2, m2;
       var eLen = nBytes * 8 - mLen - 1;
@@ -233,16 +223,17 @@ var require_ieee754 = __commonJS({
 var require_buffer = __commonJS({
   "node_modules/buffer/index.js"(exports) {
     "use strict";
+    init_buffer_global();
     var base64 = require_base64_js();
     var ieee754 = require_ieee754();
     var customInspectSymbol = typeof Symbol === "function" && typeof Symbol["for"] === "function" ? Symbol["for"]("nodejs.util.inspect.custom") : null;
-    exports.Buffer = Buffer2;
+    exports.Buffer = Buffer3;
     exports.SlowBuffer = SlowBuffer;
     exports.INSPECT_MAX_BYTES = 50;
     var K_MAX_LENGTH = 2147483647;
     exports.kMaxLength = K_MAX_LENGTH;
-    Buffer2.TYPED_ARRAY_SUPPORT = typedArraySupport();
-    if (!Buffer2.TYPED_ARRAY_SUPPORT && typeof console !== "undefined" && typeof console.error === "function") {
+    Buffer3.TYPED_ARRAY_SUPPORT = typedArraySupport();
+    if (!Buffer3.TYPED_ARRAY_SUPPORT && typeof console !== "undefined" && typeof console.error === "function") {
       console.error(
         "This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support."
       );
@@ -260,17 +251,17 @@ var require_buffer = __commonJS({
         return false;
       }
     }
-    Object.defineProperty(Buffer2.prototype, "parent", {
+    Object.defineProperty(Buffer3.prototype, "parent", {
       enumerable: true,
       get: function() {
-        if (!Buffer2.isBuffer(this)) return void 0;
+        if (!Buffer3.isBuffer(this)) return void 0;
         return this.buffer;
       }
     });
-    Object.defineProperty(Buffer2.prototype, "offset", {
+    Object.defineProperty(Buffer3.prototype, "offset", {
       enumerable: true,
       get: function() {
-        if (!Buffer2.isBuffer(this)) return void 0;
+        if (!Buffer3.isBuffer(this)) return void 0;
         return this.byteOffset;
       }
     });
@@ -279,10 +270,10 @@ var require_buffer = __commonJS({
         throw new RangeError('The value "' + length + '" is invalid for option "size"');
       }
       const buf = new Uint8Array(length);
-      Object.setPrototypeOf(buf, Buffer2.prototype);
+      Object.setPrototypeOf(buf, Buffer3.prototype);
       return buf;
     }
-    function Buffer2(arg, encodingOrOffset, length) {
+    function Buffer3(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
         if (typeof encodingOrOffset === "string") {
           throw new TypeError(
@@ -293,7 +284,7 @@ var require_buffer = __commonJS({
       }
       return from(arg, encodingOrOffset, length);
     }
-    Buffer2.poolSize = 8192;
+    Buffer3.poolSize = 8192;
     function from(value, encodingOrOffset, length) {
       if (typeof value === "string") {
         return fromString(value, encodingOrOffset);
@@ -319,22 +310,22 @@ var require_buffer = __commonJS({
       }
       const valueOf = value.valueOf && value.valueOf();
       if (valueOf != null && valueOf !== value) {
-        return Buffer2.from(valueOf, encodingOrOffset, length);
+        return Buffer3.from(valueOf, encodingOrOffset, length);
       }
       const b2 = fromObject(value);
       if (b2) return b2;
       if (typeof Symbol !== "undefined" && Symbol.toPrimitive != null && typeof value[Symbol.toPrimitive] === "function") {
-        return Buffer2.from(value[Symbol.toPrimitive]("string"), encodingOrOffset, length);
+        return Buffer3.from(value[Symbol.toPrimitive]("string"), encodingOrOffset, length);
       }
       throw new TypeError(
         "The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value
       );
     }
-    Buffer2.from = function(value, encodingOrOffset, length) {
+    Buffer3.from = function(value, encodingOrOffset, length) {
       return from(value, encodingOrOffset, length);
     };
-    Object.setPrototypeOf(Buffer2.prototype, Uint8Array.prototype);
-    Object.setPrototypeOf(Buffer2, Uint8Array);
+    Object.setPrototypeOf(Buffer3.prototype, Uint8Array.prototype);
+    Object.setPrototypeOf(Buffer3, Uint8Array);
     function assertSize(size) {
       if (typeof size !== "number") {
         throw new TypeError('"size" argument must be of type number');
@@ -352,24 +343,24 @@ var require_buffer = __commonJS({
       }
       return createBuffer(size);
     }
-    Buffer2.alloc = function(size, fill, encoding) {
+    Buffer3.alloc = function(size, fill, encoding) {
       return alloc(size, fill, encoding);
     };
     function allocUnsafe(size) {
       assertSize(size);
       return createBuffer(size < 0 ? 0 : checked(size) | 0);
     }
-    Buffer2.allocUnsafe = function(size) {
+    Buffer3.allocUnsafe = function(size) {
       return allocUnsafe(size);
     };
-    Buffer2.allocUnsafeSlow = function(size) {
+    Buffer3.allocUnsafeSlow = function(size) {
       return allocUnsafe(size);
     };
     function fromString(string, encoding) {
       if (typeof encoding !== "string" || encoding === "") {
         encoding = "utf8";
       }
-      if (!Buffer2.isEncoding(encoding)) {
+      if (!Buffer3.isEncoding(encoding)) {
         throw new TypeError("Unknown encoding: " + encoding);
       }
       const length = byteLength(string, encoding) | 0;
@@ -410,11 +401,11 @@ var require_buffer = __commonJS({
       } else {
         buf = new Uint8Array(array, byteOffset, length);
       }
-      Object.setPrototypeOf(buf, Buffer2.prototype);
+      Object.setPrototypeOf(buf, Buffer3.prototype);
       return buf;
     }
     function fromObject(obj) {
-      if (Buffer2.isBuffer(obj)) {
+      if (Buffer3.isBuffer(obj)) {
         const len = checked(obj.length) | 0;
         const buf = createBuffer(len);
         if (buf.length === 0) {
@@ -443,15 +434,15 @@ var require_buffer = __commonJS({
       if (+length != length) {
         length = 0;
       }
-      return Buffer2.alloc(+length);
+      return Buffer3.alloc(+length);
     }
-    Buffer2.isBuffer = function isBuffer(b2) {
-      return b2 != null && b2._isBuffer === true && b2 !== Buffer2.prototype;
+    Buffer3.isBuffer = function isBuffer(b2) {
+      return b2 != null && b2._isBuffer === true && b2 !== Buffer3.prototype;
     };
-    Buffer2.compare = function compare(a2, b2) {
-      if (isInstance(a2, Uint8Array)) a2 = Buffer2.from(a2, a2.offset, a2.byteLength);
-      if (isInstance(b2, Uint8Array)) b2 = Buffer2.from(b2, b2.offset, b2.byteLength);
-      if (!Buffer2.isBuffer(a2) || !Buffer2.isBuffer(b2)) {
+    Buffer3.compare = function compare(a2, b2) {
+      if (isInstance(a2, Uint8Array)) a2 = Buffer3.from(a2, a2.offset, a2.byteLength);
+      if (isInstance(b2, Uint8Array)) b2 = Buffer3.from(b2, b2.offset, b2.byteLength);
+      if (!Buffer3.isBuffer(a2) || !Buffer3.isBuffer(b2)) {
         throw new TypeError(
           'The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array'
         );
@@ -470,7 +461,7 @@ var require_buffer = __commonJS({
       if (y2 < x2) return 1;
       return 0;
     };
-    Buffer2.isEncoding = function isEncoding(encoding) {
+    Buffer3.isEncoding = function isEncoding(encoding) {
       switch (String(encoding).toLowerCase()) {
         case "hex":
         case "utf8":
@@ -488,12 +479,12 @@ var require_buffer = __commonJS({
           return false;
       }
     };
-    Buffer2.concat = function concat(list, length) {
+    Buffer3.concat = function concat(list, length) {
       if (!Array.isArray(list)) {
         throw new TypeError('"list" argument must be an Array of Buffers');
       }
       if (list.length === 0) {
-        return Buffer2.alloc(0);
+        return Buffer3.alloc(0);
       }
       let i2;
       if (length === void 0) {
@@ -502,13 +493,13 @@ var require_buffer = __commonJS({
           length += list[i2].length;
         }
       }
-      const buffer = Buffer2.allocUnsafe(length);
+      const buffer = Buffer3.allocUnsafe(length);
       let pos = 0;
       for (i2 = 0; i2 < list.length; ++i2) {
         let buf = list[i2];
         if (isInstance(buf, Uint8Array)) {
           if (pos + buf.length > buffer.length) {
-            if (!Buffer2.isBuffer(buf)) buf = Buffer2.from(buf);
+            if (!Buffer3.isBuffer(buf)) buf = Buffer3.from(buf);
             buf.copy(buffer, pos);
           } else {
             Uint8Array.prototype.set.call(
@@ -517,7 +508,7 @@ var require_buffer = __commonJS({
               pos
             );
           }
-        } else if (!Buffer2.isBuffer(buf)) {
+        } else if (!Buffer3.isBuffer(buf)) {
           throw new TypeError('"list" argument must be an Array of Buffers');
         } else {
           buf.copy(buffer, pos);
@@ -527,7 +518,7 @@ var require_buffer = __commonJS({
       return buffer;
     };
     function byteLength(string, encoding) {
-      if (Buffer2.isBuffer(string)) {
+      if (Buffer3.isBuffer(string)) {
         return string.length;
       }
       if (ArrayBuffer.isView(string) || isInstance(string, ArrayBuffer)) {
@@ -569,7 +560,7 @@ var require_buffer = __commonJS({
         }
       }
     }
-    Buffer2.byteLength = byteLength;
+    Buffer3.byteLength = byteLength;
     function slowToString(encoding, start, end) {
       let loweredCase = false;
       if (start === void 0 || start < 0) {
@@ -616,13 +607,13 @@ var require_buffer = __commonJS({
         }
       }
     }
-    Buffer2.prototype._isBuffer = true;
+    Buffer3.prototype._isBuffer = true;
     function swap(b2, n2, m2) {
       const i2 = b2[n2];
       b2[n2] = b2[m2];
       b2[m2] = i2;
     }
-    Buffer2.prototype.swap16 = function swap16() {
+    Buffer3.prototype.swap16 = function swap16() {
       const len = this.length;
       if (len % 2 !== 0) {
         throw new RangeError("Buffer size must be a multiple of 16-bits");
@@ -632,7 +623,7 @@ var require_buffer = __commonJS({
       }
       return this;
     };
-    Buffer2.prototype.swap32 = function swap32() {
+    Buffer3.prototype.swap32 = function swap32() {
       const len = this.length;
       if (len % 4 !== 0) {
         throw new RangeError("Buffer size must be a multiple of 32-bits");
@@ -643,7 +634,7 @@ var require_buffer = __commonJS({
       }
       return this;
     };
-    Buffer2.prototype.swap64 = function swap64() {
+    Buffer3.prototype.swap64 = function swap64() {
       const len = this.length;
       if (len % 8 !== 0) {
         throw new RangeError("Buffer size must be a multiple of 64-bits");
@@ -656,19 +647,19 @@ var require_buffer = __commonJS({
       }
       return this;
     };
-    Buffer2.prototype.toString = function toString() {
+    Buffer3.prototype.toString = function toString() {
       const length = this.length;
       if (length === 0) return "";
       if (arguments.length === 0) return utf8Slice(this, 0, length);
       return slowToString.apply(this, arguments);
     };
-    Buffer2.prototype.toLocaleString = Buffer2.prototype.toString;
-    Buffer2.prototype.equals = function equals(b2) {
-      if (!Buffer2.isBuffer(b2)) throw new TypeError("Argument must be a Buffer");
+    Buffer3.prototype.toLocaleString = Buffer3.prototype.toString;
+    Buffer3.prototype.equals = function equals(b2) {
+      if (!Buffer3.isBuffer(b2)) throw new TypeError("Argument must be a Buffer");
       if (this === b2) return true;
-      return Buffer2.compare(this, b2) === 0;
+      return Buffer3.compare(this, b2) === 0;
     };
-    Buffer2.prototype.inspect = function inspect() {
+    Buffer3.prototype.inspect = function inspect() {
       let str = "";
       const max = exports.INSPECT_MAX_BYTES;
       str = this.toString("hex", 0, max).replace(/(.{2})/g, "$1 ").trim();
@@ -676,13 +667,13 @@ var require_buffer = __commonJS({
       return "<Buffer " + str + ">";
     };
     if (customInspectSymbol) {
-      Buffer2.prototype[customInspectSymbol] = Buffer2.prototype.inspect;
+      Buffer3.prototype[customInspectSymbol] = Buffer3.prototype.inspect;
     }
-    Buffer2.prototype.compare = function compare(target, start, end, thisStart, thisEnd) {
+    Buffer3.prototype.compare = function compare(target, start, end, thisStart, thisEnd) {
       if (isInstance(target, Uint8Array)) {
-        target = Buffer2.from(target, target.offset, target.byteLength);
+        target = Buffer3.from(target, target.offset, target.byteLength);
       }
-      if (!Buffer2.isBuffer(target)) {
+      if (!Buffer3.isBuffer(target)) {
         throw new TypeError(
           'The "target" argument must be one of type Buffer or Uint8Array. Received type ' + typeof target
         );
@@ -755,9 +746,9 @@ var require_buffer = __commonJS({
         else return -1;
       }
       if (typeof val === "string") {
-        val = Buffer2.from(val, encoding);
+        val = Buffer3.from(val, encoding);
       }
-      if (Buffer2.isBuffer(val)) {
+      if (Buffer3.isBuffer(val)) {
         if (val.length === 0) {
           return -1;
         }
@@ -825,13 +816,13 @@ var require_buffer = __commonJS({
       }
       return -1;
     }
-    Buffer2.prototype.includes = function includes(val, byteOffset, encoding) {
+    Buffer3.prototype.includes = function includes(val, byteOffset, encoding) {
       return this.indexOf(val, byteOffset, encoding) !== -1;
     };
-    Buffer2.prototype.indexOf = function indexOf(val, byteOffset, encoding) {
+    Buffer3.prototype.indexOf = function indexOf(val, byteOffset, encoding) {
       return bidirectionalIndexOf(this, val, byteOffset, encoding, true);
     };
-    Buffer2.prototype.lastIndexOf = function lastIndexOf(val, byteOffset, encoding) {
+    Buffer3.prototype.lastIndexOf = function lastIndexOf(val, byteOffset, encoding) {
       return bidirectionalIndexOf(this, val, byteOffset, encoding, false);
     };
     function hexWrite(buf, string, offset, length) {
@@ -869,7 +860,7 @@ var require_buffer = __commonJS({
     function ucs2Write(buf, string, offset, length) {
       return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length);
     }
-    Buffer2.prototype.write = function write(string, offset, length, encoding) {
+    Buffer3.prototype.write = function write(string, offset, length, encoding) {
       if (offset === void 0) {
         encoding = "utf8";
         length = this.length;
@@ -924,7 +915,7 @@ var require_buffer = __commonJS({
         }
       }
     };
-    Buffer2.prototype.toJSON = function toJSON() {
+    Buffer3.prototype.toJSON = function toJSON() {
       return {
         type: "Buffer",
         data: Array.prototype.slice.call(this._arr || this, 0)
@@ -1047,7 +1038,7 @@ var require_buffer = __commonJS({
       }
       return res;
     }
-    Buffer2.prototype.slice = function slice(start, end) {
+    Buffer3.prototype.slice = function slice(start, end) {
       const len = this.length;
       start = ~~start;
       end = end === void 0 ? len : ~~end;
@@ -1065,14 +1056,14 @@ var require_buffer = __commonJS({
       }
       if (end < start) end = start;
       const newBuf = this.subarray(start, end);
-      Object.setPrototypeOf(newBuf, Buffer2.prototype);
+      Object.setPrototypeOf(newBuf, Buffer3.prototype);
       return newBuf;
     };
     function checkOffset(offset, ext, length) {
       if (offset % 1 !== 0 || offset < 0) throw new RangeError("offset is not uint");
       if (offset + ext > length) throw new RangeError("Trying to access beyond buffer length");
     }
-    Buffer2.prototype.readUintLE = Buffer2.prototype.readUIntLE = function readUIntLE(offset, byteLength2, noAssert) {
+    Buffer3.prototype.readUintLE = Buffer3.prototype.readUIntLE = function readUIntLE(offset, byteLength2, noAssert) {
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
       if (!noAssert) checkOffset(offset, byteLength2, this.length);
@@ -1084,7 +1075,7 @@ var require_buffer = __commonJS({
       }
       return val;
     };
-    Buffer2.prototype.readUintBE = Buffer2.prototype.readUIntBE = function readUIntBE(offset, byteLength2, noAssert) {
+    Buffer3.prototype.readUintBE = Buffer3.prototype.readUIntBE = function readUIntBE(offset, byteLength2, noAssert) {
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
       if (!noAssert) {
@@ -1097,32 +1088,32 @@ var require_buffer = __commonJS({
       }
       return val;
     };
-    Buffer2.prototype.readUint8 = Buffer2.prototype.readUInt8 = function readUInt8(offset, noAssert) {
+    Buffer3.prototype.readUint8 = Buffer3.prototype.readUInt8 = function readUInt8(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 1, this.length);
       return this[offset];
     };
-    Buffer2.prototype.readUint16LE = Buffer2.prototype.readUInt16LE = function readUInt16LE(offset, noAssert) {
+    Buffer3.prototype.readUint16LE = Buffer3.prototype.readUInt16LE = function readUInt16LE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 2, this.length);
       return this[offset] | this[offset + 1] << 8;
     };
-    Buffer2.prototype.readUint16BE = Buffer2.prototype.readUInt16BE = function readUInt16BE(offset, noAssert) {
+    Buffer3.prototype.readUint16BE = Buffer3.prototype.readUInt16BE = function readUInt16BE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 2, this.length);
       return this[offset] << 8 | this[offset + 1];
     };
-    Buffer2.prototype.readUint32LE = Buffer2.prototype.readUInt32LE = function readUInt32LE(offset, noAssert) {
+    Buffer3.prototype.readUint32LE = Buffer3.prototype.readUInt32LE = function readUInt32LE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return (this[offset] | this[offset + 1] << 8 | this[offset + 2] << 16) + this[offset + 3] * 16777216;
     };
-    Buffer2.prototype.readUint32BE = Buffer2.prototype.readUInt32BE = function readUInt32BE(offset, noAssert) {
+    Buffer3.prototype.readUint32BE = Buffer3.prototype.readUInt32BE = function readUInt32BE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return this[offset] * 16777216 + (this[offset + 1] << 16 | this[offset + 2] << 8 | this[offset + 3]);
     };
-    Buffer2.prototype.readBigUInt64LE = defineBigIntMethod(function readBigUInt64LE(offset) {
+    Buffer3.prototype.readBigUInt64LE = defineBigIntMethod(function readBigUInt64LE(offset) {
       offset = offset >>> 0;
       validateNumber(offset, "offset");
       const first = this[offset];
@@ -1134,7 +1125,7 @@ var require_buffer = __commonJS({
       const hi = this[++offset] + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + last * 2 ** 24;
       return BigInt(lo) + (BigInt(hi) << BigInt(32));
     });
-    Buffer2.prototype.readBigUInt64BE = defineBigIntMethod(function readBigUInt64BE(offset) {
+    Buffer3.prototype.readBigUInt64BE = defineBigIntMethod(function readBigUInt64BE(offset) {
       offset = offset >>> 0;
       validateNumber(offset, "offset");
       const first = this[offset];
@@ -1146,7 +1137,7 @@ var require_buffer = __commonJS({
       const lo = this[++offset] * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + last;
       return (BigInt(hi) << BigInt(32)) + BigInt(lo);
     });
-    Buffer2.prototype.readIntLE = function readIntLE(offset, byteLength2, noAssert) {
+    Buffer3.prototype.readIntLE = function readIntLE(offset, byteLength2, noAssert) {
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
       if (!noAssert) checkOffset(offset, byteLength2, this.length);
@@ -1160,7 +1151,7 @@ var require_buffer = __commonJS({
       if (val >= mul) val -= Math.pow(2, 8 * byteLength2);
       return val;
     };
-    Buffer2.prototype.readIntBE = function readIntBE(offset, byteLength2, noAssert) {
+    Buffer3.prototype.readIntBE = function readIntBE(offset, byteLength2, noAssert) {
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
       if (!noAssert) checkOffset(offset, byteLength2, this.length);
@@ -1174,35 +1165,35 @@ var require_buffer = __commonJS({
       if (val >= mul) val -= Math.pow(2, 8 * byteLength2);
       return val;
     };
-    Buffer2.prototype.readInt8 = function readInt8(offset, noAssert) {
+    Buffer3.prototype.readInt8 = function readInt8(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 1, this.length);
       if (!(this[offset] & 128)) return this[offset];
       return (255 - this[offset] + 1) * -1;
     };
-    Buffer2.prototype.readInt16LE = function readInt16LE(offset, noAssert) {
+    Buffer3.prototype.readInt16LE = function readInt16LE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 2, this.length);
       const val = this[offset] | this[offset + 1] << 8;
       return val & 32768 ? val | 4294901760 : val;
     };
-    Buffer2.prototype.readInt16BE = function readInt16BE(offset, noAssert) {
+    Buffer3.prototype.readInt16BE = function readInt16BE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 2, this.length);
       const val = this[offset + 1] | this[offset] << 8;
       return val & 32768 ? val | 4294901760 : val;
     };
-    Buffer2.prototype.readInt32LE = function readInt32LE(offset, noAssert) {
+    Buffer3.prototype.readInt32LE = function readInt32LE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return this[offset] | this[offset + 1] << 8 | this[offset + 2] << 16 | this[offset + 3] << 24;
     };
-    Buffer2.prototype.readInt32BE = function readInt32BE(offset, noAssert) {
+    Buffer3.prototype.readInt32BE = function readInt32BE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return this[offset] << 24 | this[offset + 1] << 16 | this[offset + 2] << 8 | this[offset + 3];
     };
-    Buffer2.prototype.readBigInt64LE = defineBigIntMethod(function readBigInt64LE(offset) {
+    Buffer3.prototype.readBigInt64LE = defineBigIntMethod(function readBigInt64LE(offset) {
       offset = offset >>> 0;
       validateNumber(offset, "offset");
       const first = this[offset];
@@ -1213,7 +1204,7 @@ var require_buffer = __commonJS({
       const val = this[offset + 4] + this[offset + 5] * 2 ** 8 + this[offset + 6] * 2 ** 16 + (last << 24);
       return (BigInt(val) << BigInt(32)) + BigInt(first + this[++offset] * 2 ** 8 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 24);
     });
-    Buffer2.prototype.readBigInt64BE = defineBigIntMethod(function readBigInt64BE(offset) {
+    Buffer3.prototype.readBigInt64BE = defineBigIntMethod(function readBigInt64BE(offset) {
       offset = offset >>> 0;
       validateNumber(offset, "offset");
       const first = this[offset];
@@ -1225,32 +1216,32 @@ var require_buffer = __commonJS({
       this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + this[++offset];
       return (BigInt(val) << BigInt(32)) + BigInt(this[++offset] * 2 ** 24 + this[++offset] * 2 ** 16 + this[++offset] * 2 ** 8 + last);
     });
-    Buffer2.prototype.readFloatLE = function readFloatLE(offset, noAssert) {
+    Buffer3.prototype.readFloatLE = function readFloatLE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return ieee754.read(this, offset, true, 23, 4);
     };
-    Buffer2.prototype.readFloatBE = function readFloatBE(offset, noAssert) {
+    Buffer3.prototype.readFloatBE = function readFloatBE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 4, this.length);
       return ieee754.read(this, offset, false, 23, 4);
     };
-    Buffer2.prototype.readDoubleLE = function readDoubleLE(offset, noAssert) {
+    Buffer3.prototype.readDoubleLE = function readDoubleLE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 8, this.length);
       return ieee754.read(this, offset, true, 52, 8);
     };
-    Buffer2.prototype.readDoubleBE = function readDoubleBE(offset, noAssert) {
+    Buffer3.prototype.readDoubleBE = function readDoubleBE(offset, noAssert) {
       offset = offset >>> 0;
       if (!noAssert) checkOffset(offset, 8, this.length);
       return ieee754.read(this, offset, false, 52, 8);
     };
     function checkInt(buf, value, offset, ext, max, min) {
-      if (!Buffer2.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance');
+      if (!Buffer3.isBuffer(buf)) throw new TypeError('"buffer" argument must be a Buffer instance');
       if (value > max || value < min) throw new RangeError('"value" argument is out of bounds');
       if (offset + ext > buf.length) throw new RangeError("Index out of range");
     }
-    Buffer2.prototype.writeUintLE = Buffer2.prototype.writeUIntLE = function writeUIntLE(value, offset, byteLength2, noAssert) {
+    Buffer3.prototype.writeUintLE = Buffer3.prototype.writeUIntLE = function writeUIntLE(value, offset, byteLength2, noAssert) {
       value = +value;
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
@@ -1266,7 +1257,7 @@ var require_buffer = __commonJS({
       }
       return offset + byteLength2;
     };
-    Buffer2.prototype.writeUintBE = Buffer2.prototype.writeUIntBE = function writeUIntBE(value, offset, byteLength2, noAssert) {
+    Buffer3.prototype.writeUintBE = Buffer3.prototype.writeUIntBE = function writeUIntBE(value, offset, byteLength2, noAssert) {
       value = +value;
       offset = offset >>> 0;
       byteLength2 = byteLength2 >>> 0;
@@ -1282,14 +1273,14 @@ var require_buffer = __commonJS({
       }
       return offset + byteLength2;
     };
-    Buffer2.prototype.writeUint8 = Buffer2.prototype.writeUInt8 = function writeUInt8(value, offset, noAssert) {
+    Buffer3.prototype.writeUint8 = Buffer3.prototype.writeUInt8 = function writeUInt8(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 1, 255, 0);
       this[offset] = value & 255;
       return offset + 1;
     };
-    Buffer2.prototype.writeUint16LE = Buffer2.prototype.writeUInt16LE = function writeUInt16LE(value, offset, noAssert) {
+    Buffer3.prototype.writeUint16LE = Buffer3.prototype.writeUInt16LE = function writeUInt16LE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 2, 65535, 0);
@@ -1297,7 +1288,7 @@ var require_buffer = __commonJS({
       this[offset + 1] = value >>> 8;
       return offset + 2;
     };
-    Buffer2.prototype.writeUint16BE = Buffer2.prototype.writeUInt16BE = function writeUInt16BE(value, offset, noAssert) {
+    Buffer3.prototype.writeUint16BE = Buffer3.prototype.writeUInt16BE = function writeUInt16BE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 2, 65535, 0);
@@ -1305,7 +1296,7 @@ var require_buffer = __commonJS({
       this[offset + 1] = value & 255;
       return offset + 2;
     };
-    Buffer2.prototype.writeUint32LE = Buffer2.prototype.writeUInt32LE = function writeUInt32LE(value, offset, noAssert) {
+    Buffer3.prototype.writeUint32LE = Buffer3.prototype.writeUInt32LE = function writeUInt32LE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 4, 4294967295, 0);
@@ -1315,7 +1306,7 @@ var require_buffer = __commonJS({
       this[offset] = value & 255;
       return offset + 4;
     };
-    Buffer2.prototype.writeUint32BE = Buffer2.prototype.writeUInt32BE = function writeUInt32BE(value, offset, noAssert) {
+    Buffer3.prototype.writeUint32BE = Buffer3.prototype.writeUInt32BE = function writeUInt32BE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 4, 4294967295, 0);
@@ -1365,13 +1356,13 @@ var require_buffer = __commonJS({
       buf[offset] = hi;
       return offset + 8;
     }
-    Buffer2.prototype.writeBigUInt64LE = defineBigIntMethod(function writeBigUInt64LE(value, offset = 0) {
+    Buffer3.prototype.writeBigUInt64LE = defineBigIntMethod(function writeBigUInt64LE(value, offset = 0) {
       return wrtBigUInt64LE(this, value, offset, BigInt(0), BigInt("0xffffffffffffffff"));
     });
-    Buffer2.prototype.writeBigUInt64BE = defineBigIntMethod(function writeBigUInt64BE(value, offset = 0) {
+    Buffer3.prototype.writeBigUInt64BE = defineBigIntMethod(function writeBigUInt64BE(value, offset = 0) {
       return wrtBigUInt64BE(this, value, offset, BigInt(0), BigInt("0xffffffffffffffff"));
     });
-    Buffer2.prototype.writeIntLE = function writeIntLE(value, offset, byteLength2, noAssert) {
+    Buffer3.prototype.writeIntLE = function writeIntLE(value, offset, byteLength2, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) {
@@ -1390,7 +1381,7 @@ var require_buffer = __commonJS({
       }
       return offset + byteLength2;
     };
-    Buffer2.prototype.writeIntBE = function writeIntBE(value, offset, byteLength2, noAssert) {
+    Buffer3.prototype.writeIntBE = function writeIntBE(value, offset, byteLength2, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) {
@@ -1409,7 +1400,7 @@ var require_buffer = __commonJS({
       }
       return offset + byteLength2;
     };
-    Buffer2.prototype.writeInt8 = function writeInt8(value, offset, noAssert) {
+    Buffer3.prototype.writeInt8 = function writeInt8(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 1, 127, -128);
@@ -1417,7 +1408,7 @@ var require_buffer = __commonJS({
       this[offset] = value & 255;
       return offset + 1;
     };
-    Buffer2.prototype.writeInt16LE = function writeInt16LE(value, offset, noAssert) {
+    Buffer3.prototype.writeInt16LE = function writeInt16LE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 2, 32767, -32768);
@@ -1425,7 +1416,7 @@ var require_buffer = __commonJS({
       this[offset + 1] = value >>> 8;
       return offset + 2;
     };
-    Buffer2.prototype.writeInt16BE = function writeInt16BE(value, offset, noAssert) {
+    Buffer3.prototype.writeInt16BE = function writeInt16BE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 2, 32767, -32768);
@@ -1433,7 +1424,7 @@ var require_buffer = __commonJS({
       this[offset + 1] = value & 255;
       return offset + 2;
     };
-    Buffer2.prototype.writeInt32LE = function writeInt32LE(value, offset, noAssert) {
+    Buffer3.prototype.writeInt32LE = function writeInt32LE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 4, 2147483647, -2147483648);
@@ -1443,7 +1434,7 @@ var require_buffer = __commonJS({
       this[offset + 3] = value >>> 24;
       return offset + 4;
     };
-    Buffer2.prototype.writeInt32BE = function writeInt32BE(value, offset, noAssert) {
+    Buffer3.prototype.writeInt32BE = function writeInt32BE(value, offset, noAssert) {
       value = +value;
       offset = offset >>> 0;
       if (!noAssert) checkInt(this, value, offset, 4, 2147483647, -2147483648);
@@ -1454,10 +1445,10 @@ var require_buffer = __commonJS({
       this[offset + 3] = value & 255;
       return offset + 4;
     };
-    Buffer2.prototype.writeBigInt64LE = defineBigIntMethod(function writeBigInt64LE(value, offset = 0) {
+    Buffer3.prototype.writeBigInt64LE = defineBigIntMethod(function writeBigInt64LE(value, offset = 0) {
       return wrtBigUInt64LE(this, value, offset, -BigInt("0x8000000000000000"), BigInt("0x7fffffffffffffff"));
     });
-    Buffer2.prototype.writeBigInt64BE = defineBigIntMethod(function writeBigInt64BE(value, offset = 0) {
+    Buffer3.prototype.writeBigInt64BE = defineBigIntMethod(function writeBigInt64BE(value, offset = 0) {
       return wrtBigUInt64BE(this, value, offset, -BigInt("0x8000000000000000"), BigInt("0x7fffffffffffffff"));
     });
     function checkIEEE754(buf, value, offset, ext, max, min) {
@@ -1473,10 +1464,10 @@ var require_buffer = __commonJS({
       ieee754.write(buf, value, offset, littleEndian, 23, 4);
       return offset + 4;
     }
-    Buffer2.prototype.writeFloatLE = function writeFloatLE(value, offset, noAssert) {
+    Buffer3.prototype.writeFloatLE = function writeFloatLE(value, offset, noAssert) {
       return writeFloat(this, value, offset, true, noAssert);
     };
-    Buffer2.prototype.writeFloatBE = function writeFloatBE(value, offset, noAssert) {
+    Buffer3.prototype.writeFloatBE = function writeFloatBE(value, offset, noAssert) {
       return writeFloat(this, value, offset, false, noAssert);
     };
     function writeDouble(buf, value, offset, littleEndian, noAssert) {
@@ -1488,14 +1479,14 @@ var require_buffer = __commonJS({
       ieee754.write(buf, value, offset, littleEndian, 52, 8);
       return offset + 8;
     }
-    Buffer2.prototype.writeDoubleLE = function writeDoubleLE(value, offset, noAssert) {
+    Buffer3.prototype.writeDoubleLE = function writeDoubleLE(value, offset, noAssert) {
       return writeDouble(this, value, offset, true, noAssert);
     };
-    Buffer2.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAssert) {
+    Buffer3.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAssert) {
       return writeDouble(this, value, offset, false, noAssert);
     };
-    Buffer2.prototype.copy = function copy(target, targetStart, start, end) {
-      if (!Buffer2.isBuffer(target)) throw new TypeError("argument should be a Buffer");
+    Buffer3.prototype.copy = function copy(target, targetStart, start, end) {
+      if (!Buffer3.isBuffer(target)) throw new TypeError("argument should be a Buffer");
       if (!start) start = 0;
       if (!end && end !== 0) end = this.length;
       if (targetStart >= target.length) targetStart = target.length;
@@ -1524,7 +1515,7 @@ var require_buffer = __commonJS({
       }
       return len;
     };
-    Buffer2.prototype.fill = function fill(val, start, end, encoding) {
+    Buffer3.prototype.fill = function fill(val, start, end, encoding) {
       if (typeof val === "string") {
         if (typeof start === "string") {
           encoding = start;
@@ -1537,7 +1528,7 @@ var require_buffer = __commonJS({
         if (encoding !== void 0 && typeof encoding !== "string") {
           throw new TypeError("encoding must be a string");
         }
-        if (typeof encoding === "string" && !Buffer2.isEncoding(encoding)) {
+        if (typeof encoding === "string" && !Buffer3.isEncoding(encoding)) {
           throw new TypeError("Unknown encoding: " + encoding);
         }
         if (val.length === 1) {
@@ -1566,7 +1557,7 @@ var require_buffer = __commonJS({
           this[i2] = val;
         }
       } else {
-        const bytes = Buffer2.isBuffer(val) ? val : Buffer2.from(val, encoding);
+        const bytes = Buffer3.isBuffer(val) ? val : Buffer3.from(val, encoding);
         const len = bytes.length;
         if (len === 0) {
           throw new TypeError('The value "' + val + '" is invalid for argument "value"');
@@ -1821,10 +1812,33 @@ var require_buffer = __commonJS({
   }
 });
 
+// buffer-global.js
+var import_buffer;
+var init_buffer_global = __esm({
+  "buffer-global.js"() {
+    import_buffer = __toESM(require_buffer());
+    globalThis.Buffer = import_buffer.Buffer;
+  }
+});
+
+// fs-stub.js
+var fs_stub_exports = {};
+__export(fs_stub_exports, {
+  default: () => fs_stub_default
+});
+var fs_stub_default;
+var init_fs_stub = __esm({
+  "fs-stub.js"() {
+    init_buffer_global();
+    fs_stub_default = {};
+  }
+});
+
 // node_modules/events/events.js
 var require_events = __commonJS({
   "node_modules/events/events.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var R2 = typeof Reflect === "object" ? Reflect : null;
     var ReflectApply = R2 && typeof R2.apply === "function" ? R2.apply : function ReflectApply2(target, receiver, args) {
       return Function.prototype.apply.call(target, receiver, args);
@@ -2193,6 +2207,7 @@ var require_events = __commonJS({
 // node_modules/inherits/inherits_browser.js
 var require_inherits_browser = __commonJS({
   "node_modules/inherits/inherits_browser.js"(exports, module) {
+    init_buffer_global();
     if (typeof Object.create === "function") {
       module.exports = function inherits(ctor, superCtor) {
         if (superCtor) {
@@ -2225,6 +2240,7 @@ var require_inherits_browser = __commonJS({
 // node_modules/readable-stream/lib/internal/streams/stream-browser.js
 var require_stream_browser = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/stream-browser.js"(exports, module) {
+    init_buffer_global();
     module.exports = require_events().EventEmitter;
   }
 });
@@ -2233,6 +2249,7 @@ var require_stream_browser = __commonJS({
 var require_shams = __commonJS({
   "node_modules/has-symbols/shams.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = function hasSymbols() {
       if (typeof Symbol !== "function" || typeof Object.getOwnPropertySymbols !== "function") {
         return false;
@@ -2288,6 +2305,7 @@ var require_shams = __commonJS({
 var require_shams2 = __commonJS({
   "node_modules/has-tostringtag/shams.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var hasSymbols = require_shams();
     module.exports = function hasToStringTagShams() {
       return hasSymbols() && !!Symbol.toStringTag;
@@ -2299,6 +2317,7 @@ var require_shams2 = __commonJS({
 var require_es_object_atoms = __commonJS({
   "node_modules/es-object-atoms/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Object;
   }
 });
@@ -2307,6 +2326,7 @@ var require_es_object_atoms = __commonJS({
 var require_es_errors = __commonJS({
   "node_modules/es-errors/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Error;
   }
 });
@@ -2315,6 +2335,7 @@ var require_es_errors = __commonJS({
 var require_eval = __commonJS({
   "node_modules/es-errors/eval.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = EvalError;
   }
 });
@@ -2323,6 +2344,7 @@ var require_eval = __commonJS({
 var require_range = __commonJS({
   "node_modules/es-errors/range.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = RangeError;
   }
 });
@@ -2331,6 +2353,7 @@ var require_range = __commonJS({
 var require_ref = __commonJS({
   "node_modules/es-errors/ref.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = ReferenceError;
   }
 });
@@ -2339,6 +2362,7 @@ var require_ref = __commonJS({
 var require_syntax = __commonJS({
   "node_modules/es-errors/syntax.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = SyntaxError;
   }
 });
@@ -2347,6 +2371,7 @@ var require_syntax = __commonJS({
 var require_type = __commonJS({
   "node_modules/es-errors/type.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = TypeError;
   }
 });
@@ -2355,6 +2380,7 @@ var require_type = __commonJS({
 var require_uri = __commonJS({
   "node_modules/es-errors/uri.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = URIError;
   }
 });
@@ -2363,6 +2389,7 @@ var require_uri = __commonJS({
 var require_abs = __commonJS({
   "node_modules/math-intrinsics/abs.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.abs;
   }
 });
@@ -2371,6 +2398,7 @@ var require_abs = __commonJS({
 var require_floor = __commonJS({
   "node_modules/math-intrinsics/floor.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.floor;
   }
 });
@@ -2379,6 +2407,7 @@ var require_floor = __commonJS({
 var require_max = __commonJS({
   "node_modules/math-intrinsics/max.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.max;
   }
 });
@@ -2387,6 +2416,7 @@ var require_max = __commonJS({
 var require_min = __commonJS({
   "node_modules/math-intrinsics/min.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.min;
   }
 });
@@ -2395,6 +2425,7 @@ var require_min = __commonJS({
 var require_pow = __commonJS({
   "node_modules/math-intrinsics/pow.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.pow;
   }
 });
@@ -2403,6 +2434,7 @@ var require_pow = __commonJS({
 var require_round = __commonJS({
   "node_modules/math-intrinsics/round.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Math.round;
   }
 });
@@ -2411,6 +2443,7 @@ var require_round = __commonJS({
 var require_isNaN = __commonJS({
   "node_modules/math-intrinsics/isNaN.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Number.isNaN || function isNaN2(a2) {
       return a2 !== a2;
     };
@@ -2421,6 +2454,7 @@ var require_isNaN = __commonJS({
 var require_sign = __commonJS({
   "node_modules/math-intrinsics/sign.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $isNaN = require_isNaN();
     module.exports = function sign(number) {
       if ($isNaN(number) || number === 0) {
@@ -2435,6 +2469,7 @@ var require_sign = __commonJS({
 var require_gOPD = __commonJS({
   "node_modules/gopd/gOPD.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Object.getOwnPropertyDescriptor;
   }
 });
@@ -2443,6 +2478,7 @@ var require_gOPD = __commonJS({
 var require_gopd = __commonJS({
   "node_modules/gopd/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $gOPD = require_gOPD();
     if ($gOPD) {
       try {
@@ -2459,6 +2495,7 @@ var require_gopd = __commonJS({
 var require_es_define_property = __commonJS({
   "node_modules/es-define-property/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $defineProperty = Object.defineProperty || false;
     if ($defineProperty) {
       try {
@@ -2475,6 +2512,7 @@ var require_es_define_property = __commonJS({
 var require_has_symbols = __commonJS({
   "node_modules/has-symbols/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var origSymbol = typeof Symbol !== "undefined" && Symbol;
     var hasSymbolSham = require_shams();
     module.exports = function hasNativeSymbols() {
@@ -2499,6 +2537,7 @@ var require_has_symbols = __commonJS({
 var require_Reflect_getPrototypeOf = __commonJS({
   "node_modules/get-proto/Reflect.getPrototypeOf.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = typeof Reflect !== "undefined" && Reflect.getPrototypeOf || null;
   }
 });
@@ -2507,6 +2546,7 @@ var require_Reflect_getPrototypeOf = __commonJS({
 var require_Object_getPrototypeOf = __commonJS({
   "node_modules/get-proto/Object.getPrototypeOf.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $Object = require_es_object_atoms();
     module.exports = $Object.getPrototypeOf || null;
   }
@@ -2516,6 +2556,7 @@ var require_Object_getPrototypeOf = __commonJS({
 var require_implementation = __commonJS({
   "node_modules/function-bind/implementation.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
     var toStr = Object.prototype.toString;
     var max = Math.max;
@@ -2592,6 +2633,7 @@ var require_implementation = __commonJS({
 var require_function_bind = __commonJS({
   "node_modules/function-bind/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var implementation = require_implementation();
     module.exports = Function.prototype.bind || implementation;
   }
@@ -2601,6 +2643,7 @@ var require_function_bind = __commonJS({
 var require_functionCall = __commonJS({
   "node_modules/call-bind-apply-helpers/functionCall.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Function.prototype.call;
   }
 });
@@ -2609,6 +2652,7 @@ var require_functionCall = __commonJS({
 var require_functionApply = __commonJS({
   "node_modules/call-bind-apply-helpers/functionApply.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Function.prototype.apply;
   }
 });
@@ -2617,6 +2661,7 @@ var require_functionApply = __commonJS({
 var require_reflectApply = __commonJS({
   "node_modules/call-bind-apply-helpers/reflectApply.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
   }
 });
@@ -2625,6 +2670,7 @@ var require_reflectApply = __commonJS({
 var require_actualApply = __commonJS({
   "node_modules/call-bind-apply-helpers/actualApply.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var bind = require_function_bind();
     var $apply = require_functionApply();
     var $call = require_functionCall();
@@ -2637,6 +2683,7 @@ var require_actualApply = __commonJS({
 var require_call_bind_apply_helpers = __commonJS({
   "node_modules/call-bind-apply-helpers/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var bind = require_function_bind();
     var $TypeError = require_type();
     var $call = require_functionCall();
@@ -2654,6 +2701,7 @@ var require_call_bind_apply_helpers = __commonJS({
 var require_get = __commonJS({
   "node_modules/dunder-proto/get.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var callBind = require_call_bind_apply_helpers();
     var gOPD = require_gopd();
     var hasProtoAccessor;
@@ -2685,6 +2733,7 @@ var require_get = __commonJS({
 var require_get_proto = __commonJS({
   "node_modules/get-proto/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var reflectGetProto = require_Reflect_getPrototypeOf();
     var originalGetProto = require_Object_getPrototypeOf();
     var getDunderProto = require_get();
@@ -2705,6 +2754,7 @@ var require_get_proto = __commonJS({
 var require_hasown = __commonJS({
   "node_modules/hasown/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var call = Function.prototype.call;
     var $hasOwn = Object.prototype.hasOwnProperty;
     var bind = require_function_bind();
@@ -2716,6 +2766,7 @@ var require_hasown = __commonJS({
 var require_get_intrinsic = __commonJS({
   "node_modules/get-intrinsic/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var undefined2;
     var $Object = require_es_object_atoms();
     var $Error = require_es_errors();
@@ -3047,6 +3098,7 @@ var require_get_intrinsic = __commonJS({
 var require_call_bound = __commonJS({
   "node_modules/call-bound/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var GetIntrinsic = require_get_intrinsic();
     var callBindBasic = require_call_bind_apply_helpers();
     var $indexOf = callBindBasic([GetIntrinsic("%String.prototype.indexOf%")]);
@@ -3070,6 +3122,7 @@ var require_call_bound = __commonJS({
 var require_is_arguments = __commonJS({
   "node_modules/is-arguments/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var hasToStringTag = require_shams2()();
     var callBound = require_call_bound();
     var $toString = callBound("Object.prototype.toString");
@@ -3097,6 +3150,7 @@ var require_is_arguments = __commonJS({
 var require_is_regex = __commonJS({
   "node_modules/is-regex/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var callBound = require_call_bound();
     var hasToStringTag = require_shams2()();
     var hasOwn = require_hasown();
@@ -3166,6 +3220,7 @@ var require_is_regex = __commonJS({
 var require_safe_regex_test = __commonJS({
   "node_modules/safe-regex-test/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var callBound = require_call_bound();
     var isRegex = require_is_regex();
     var $exec = callBound("RegExp.prototype.exec");
@@ -3185,6 +3240,7 @@ var require_safe_regex_test = __commonJS({
 var require_generator_function = __commonJS({
   "node_modules/generator-function/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var cached = (
       /** @type {GeneratorFunctionConstructor} */
       function* () {
@@ -3198,6 +3254,7 @@ var require_generator_function = __commonJS({
 var require_is_generator_function = __commonJS({
   "node_modules/is-generator-function/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var callBound = require_call_bound();
     var safeRegexTest = require_safe_regex_test();
     var isFnRegex = safeRegexTest(/^\s*(?:function)?\*/);
@@ -3230,6 +3287,7 @@ var require_is_generator_function = __commonJS({
 var require_is_callable = __commonJS({
   "node_modules/is-callable/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var fnToStr = Function.prototype.toString;
     var reflectApply = typeof Reflect === "object" && Reflect !== null && Reflect.apply;
     var badArrayLike;
@@ -3348,6 +3406,7 @@ var require_is_callable = __commonJS({
 var require_for_each = __commonJS({
   "node_modules/for-each/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var isCallable = require_is_callable();
     var toStr = Object.prototype.toString;
     var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -3408,6 +3467,7 @@ var require_for_each = __commonJS({
 var require_possible_typed_array_names = __commonJS({
   "node_modules/possible-typed-array-names/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = [
       "Float16Array",
       "Float32Array",
@@ -3429,6 +3489,7 @@ var require_possible_typed_array_names = __commonJS({
 var require_available_typed_arrays = __commonJS({
   "node_modules/available-typed-arrays/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var possibleNames = require_possible_typed_array_names();
     var g2 = typeof globalThis === "undefined" ? global : globalThis;
     module.exports = function availableTypedArrays() {
@@ -3447,6 +3508,7 @@ var require_available_typed_arrays = __commonJS({
 var require_define_data_property = __commonJS({
   "node_modules/define-data-property/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $defineProperty = require_es_define_property();
     var $SyntaxError = require_syntax();
     var $TypeError = require_type();
@@ -3495,6 +3557,7 @@ var require_define_data_property = __commonJS({
 var require_has_property_descriptors = __commonJS({
   "node_modules/has-property-descriptors/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var $defineProperty = require_es_define_property();
     var hasPropertyDescriptors = function hasPropertyDescriptors2() {
       return !!$defineProperty;
@@ -3517,6 +3580,7 @@ var require_has_property_descriptors = __commonJS({
 var require_set_function_length = __commonJS({
   "node_modules/set-function-length/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var GetIntrinsic = require_get_intrinsic();
     var define = require_define_data_property();
     var hasDescriptors = require_has_property_descriptors()();
@@ -3570,6 +3634,7 @@ var require_set_function_length = __commonJS({
 var require_applyBind = __commonJS({
   "node_modules/call-bind-apply-helpers/applyBind.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var bind = require_function_bind();
     var $apply = require_functionApply();
     var actualApply = require_actualApply();
@@ -3583,6 +3648,7 @@ var require_applyBind = __commonJS({
 var require_call_bind = __commonJS({
   "node_modules/call-bind/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var setFunctionLength = require_set_function_length();
     var $defineProperty = require_es_define_property();
     var callBindBasic = require_call_bind_apply_helpers();
@@ -3608,6 +3674,7 @@ var require_call_bind = __commonJS({
 var require_which_typed_array = __commonJS({
   "node_modules/which-typed-array/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var forEach = require_for_each();
     var availableTypedArrays = require_available_typed_arrays();
     var callBind = require_call_bind();
@@ -3729,6 +3796,7 @@ var require_which_typed_array = __commonJS({
 var require_is_typed_array = __commonJS({
   "node_modules/is-typed-array/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var whichTypedArray = require_which_typed_array();
     module.exports = function isTypedArray(value) {
       return !!whichTypedArray(value);
@@ -3740,6 +3808,7 @@ var require_is_typed_array = __commonJS({
 var require_types = __commonJS({
   "node_modules/util/support/types.js"(exports) {
     "use strict";
+    init_buffer_global();
     var isArgumentsObject = require_is_arguments();
     var isGeneratorFunction = require_is_generator_function();
     var whichTypedArray = require_which_typed_array();
@@ -3969,6 +4038,7 @@ var require_types = __commonJS({
 // node_modules/util/support/isBufferBrowser.js
 var require_isBufferBrowser = __commonJS({
   "node_modules/util/support/isBufferBrowser.js"(exports, module) {
+    init_buffer_global();
     module.exports = function isBuffer(arg) {
       return arg && typeof arg === "object" && typeof arg.copy === "function" && typeof arg.fill === "function" && typeof arg.readUInt8 === "function";
     };
@@ -3978,6 +4048,7 @@ var require_isBufferBrowser = __commonJS({
 // node_modules/util/util.js
 var require_util = __commonJS({
   "node_modules/util/util.js"(exports) {
+    init_buffer_global();
     var getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors || function getOwnPropertyDescriptors2(obj) {
       var keys = Object.keys(obj);
       var descriptors = {};
@@ -4538,6 +4609,7 @@ var require_util = __commonJS({
 var require_buffer_list = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/buffer_list.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function ownKeys(object, enumerableOnly) {
       var keys = Object.keys(object);
       if (Object.getOwnPropertySymbols) {
@@ -4603,12 +4675,12 @@ var require_buffer_list = __commonJS({
       return (hint === "string" ? String : Number)(input);
     }
     var _require = require_buffer();
-    var Buffer2 = _require.Buffer;
+    var Buffer3 = _require.Buffer;
     var _require2 = require_util();
     var inspect = _require2.inspect;
     var custom = inspect && inspect.custom || "inspect";
     function copyBuffer(src, target, offset) {
-      Buffer2.prototype.copy.call(src, target, offset);
+      Buffer3.prototype.copy.call(src, target, offset);
     }
     module.exports = /* @__PURE__ */ (function() {
       function BufferList() {
@@ -4668,8 +4740,8 @@ var require_buffer_list = __commonJS({
       }, {
         key: "concat",
         value: function concat(n2) {
-          if (this.length === 0) return Buffer2.alloc(0);
-          var ret = Buffer2.allocUnsafe(n2 >>> 0);
+          if (this.length === 0) return Buffer3.alloc(0);
+          var ret = Buffer3.allocUnsafe(n2 >>> 0);
           var p2 = this.head;
           var i2 = 0;
           while (p2) {
@@ -4733,7 +4805,7 @@ var require_buffer_list = __commonJS({
       }, {
         key: "_getBuffer",
         value: function _getBuffer(n2) {
-          var ret = Buffer2.allocUnsafe(n2);
+          var ret = Buffer3.allocUnsafe(n2);
           var p2 = this.head;
           var c2 = 1;
           p2.data.copy(ret);
@@ -4780,6 +4852,7 @@ var require_buffer_list = __commonJS({
 var require_destroy = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/destroy.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function destroy(err, cb2) {
       var _this = this;
       var readableDestroyed = this._readableState && this._readableState.destroyed;
@@ -4869,6 +4942,7 @@ var require_destroy = __commonJS({
 var require_errors_browser = __commonJS({
   "node_modules/readable-stream/errors-browser.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function _inheritsLoose(subClass, superClass) {
       subClass.prototype = Object.create(superClass.prototype);
       subClass.prototype.constructor = subClass;
@@ -4978,6 +5052,7 @@ var require_errors_browser = __commonJS({
 var require_state = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/state.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var ERR_INVALID_OPT_VALUE = require_errors_browser().codes.ERR_INVALID_OPT_VALUE;
     function highWaterMarkFrom(options2, isDuplex, duplexKey) {
       return options2.highWaterMark != null ? options2.highWaterMark : isDuplex ? options2[duplexKey] : null;
@@ -5002,6 +5077,7 @@ var require_state = __commonJS({
 // node_modules/util-deprecate/browser.js
 var require_browser = __commonJS({
   "node_modules/util-deprecate/browser.js"(exports, module) {
+    init_buffer_global();
     module.exports = deprecate;
     function deprecate(fn, msg) {
       if (config("noDeprecation")) {
@@ -5040,6 +5116,7 @@ var require_browser = __commonJS({
 var require_stream_writable = __commonJS({
   "node_modules/readable-stream/lib/_stream_writable.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Writable;
     function CorkedRequest(state) {
       var _this = this;
@@ -5055,14 +5132,14 @@ var require_stream_writable = __commonJS({
       deprecate: require_browser()
     };
     var Stream = require_stream_browser();
-    var Buffer2 = require_buffer().Buffer;
+    var Buffer3 = require_buffer().Buffer;
     var OurUint8Array = (typeof global !== "undefined" ? global : typeof window !== "undefined" ? window : typeof self !== "undefined" ? self : {}).Uint8Array || function() {
     };
     function _uint8ArrayToBuffer(chunk) {
-      return Buffer2.from(chunk);
+      return Buffer3.from(chunk);
     }
     function _isUint8Array(obj) {
-      return Buffer2.isBuffer(obj) || obj instanceof OurUint8Array;
+      return Buffer3.isBuffer(obj) || obj instanceof OurUint8Array;
     }
     var destroyImpl = require_destroy();
     var _require = require_state();
@@ -5190,7 +5267,7 @@ var require_stream_writable = __commonJS({
       var state = this._writableState;
       var ret = false;
       var isBuf = !state.objectMode && _isUint8Array(chunk);
-      if (isBuf && !Buffer2.isBuffer(chunk)) {
+      if (isBuf && !Buffer3.isBuffer(chunk)) {
         chunk = _uint8ArrayToBuffer(chunk);
       }
       if (typeof encoding === "function") {
@@ -5234,7 +5311,7 @@ var require_stream_writable = __commonJS({
     });
     function decodeChunk(state, chunk, encoding) {
       if (!state.objectMode && state.decodeStrings !== false && typeof chunk === "string") {
-        chunk = Buffer2.from(chunk, encoding);
+        chunk = Buffer3.from(chunk, encoding);
       }
       return chunk;
     }
@@ -5511,6 +5588,7 @@ var require_stream_writable = __commonJS({
 var require_stream_duplex = __commonJS({
   "node_modules/readable-stream/lib/_stream_duplex.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var objectKeys = Object.keys || function(obj) {
       var keys2 = [];
       for (var key in obj) keys2.push(key);
@@ -5603,35 +5681,36 @@ var require_stream_duplex = __commonJS({
 // node_modules/safe-buffer/index.js
 var require_safe_buffer = __commonJS({
   "node_modules/safe-buffer/index.js"(exports, module) {
+    init_buffer_global();
     var buffer = require_buffer();
-    var Buffer2 = buffer.Buffer;
+    var Buffer3 = buffer.Buffer;
     function copyProps(src, dst) {
       for (var key in src) {
         dst[key] = src[key];
       }
     }
-    if (Buffer2.from && Buffer2.alloc && Buffer2.allocUnsafe && Buffer2.allocUnsafeSlow) {
+    if (Buffer3.from && Buffer3.alloc && Buffer3.allocUnsafe && Buffer3.allocUnsafeSlow) {
       module.exports = buffer;
     } else {
       copyProps(buffer, exports);
       exports.Buffer = SafeBuffer;
     }
     function SafeBuffer(arg, encodingOrOffset, length) {
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     }
-    SafeBuffer.prototype = Object.create(Buffer2.prototype);
-    copyProps(Buffer2, SafeBuffer);
+    SafeBuffer.prototype = Object.create(Buffer3.prototype);
+    copyProps(Buffer3, SafeBuffer);
     SafeBuffer.from = function(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
         throw new TypeError("Argument must not be a number");
       }
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     };
     SafeBuffer.alloc = function(size, fill, encoding) {
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      var buf = Buffer2(size);
+      var buf = Buffer3(size);
       if (fill !== void 0) {
         if (typeof encoding === "string") {
           buf.fill(fill, encoding);
@@ -5647,7 +5726,7 @@ var require_safe_buffer = __commonJS({
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      return Buffer2(size);
+      return Buffer3(size);
     };
     SafeBuffer.allocUnsafeSlow = function(size) {
       if (typeof size !== "number") {
@@ -5662,8 +5741,9 @@ var require_safe_buffer = __commonJS({
 var require_string_decoder = __commonJS({
   "node_modules/string_decoder/lib/string_decoder.js"(exports) {
     "use strict";
-    var Buffer2 = require_safe_buffer().Buffer;
-    var isEncoding = Buffer2.isEncoding || function(encoding) {
+    init_buffer_global();
+    var Buffer3 = require_safe_buffer().Buffer;
+    var isEncoding = Buffer3.isEncoding || function(encoding) {
       encoding = "" + encoding;
       switch (encoding && encoding.toLowerCase()) {
         case "hex":
@@ -5711,7 +5791,7 @@ var require_string_decoder = __commonJS({
     }
     function normalizeEncoding(enc) {
       var nenc = _normalizeEncoding(enc);
-      if (typeof nenc !== "string" && (Buffer2.isEncoding === isEncoding || !isEncoding(enc))) throw new Error("Unknown encoding: " + enc);
+      if (typeof nenc !== "string" && (Buffer3.isEncoding === isEncoding || !isEncoding(enc))) throw new Error("Unknown encoding: " + enc);
       return nenc || enc;
     }
     exports.StringDecoder = StringDecoder;
@@ -5740,7 +5820,7 @@ var require_string_decoder = __commonJS({
       }
       this.lastNeed = 0;
       this.lastTotal = 0;
-      this.lastChar = Buffer2.allocUnsafe(nb);
+      this.lastChar = Buffer3.allocUnsafe(nb);
     }
     StringDecoder.prototype.write = function(buf) {
       if (buf.length === 0) return "";
@@ -5900,6 +5980,7 @@ var require_string_decoder = __commonJS({
 var require_end_of_stream = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/end-of-stream.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var ERR_STREAM_PREMATURE_CLOSE = require_errors_browser().codes.ERR_STREAM_PREMATURE_CLOSE;
     function once(callback) {
       var called = false;
@@ -5989,6 +6070,7 @@ var require_end_of_stream = __commonJS({
 var require_async_iterator = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/async_iterator.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var _Object$setPrototypeO;
     function _defineProperty(obj, key, value) {
       key = _toPropertyKey(key);
@@ -6171,6 +6253,7 @@ var require_async_iterator = __commonJS({
 // node_modules/readable-stream/lib/internal/streams/from-browser.js
 var require_from_browser = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/from-browser.js"(exports, module) {
+    init_buffer_global();
     module.exports = function() {
       throw new Error("Readable.from is not available in the browser");
     };
@@ -6181,6 +6264,7 @@ var require_from_browser = __commonJS({
 var require_stream_readable = __commonJS({
   "node_modules/readable-stream/lib/_stream_readable.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Readable2;
     var Duplex;
     Readable2.ReadableState = ReadableState;
@@ -6189,14 +6273,14 @@ var require_stream_readable = __commonJS({
       return emitter.listeners(type).length;
     };
     var Stream = require_stream_browser();
-    var Buffer2 = require_buffer().Buffer;
+    var Buffer3 = require_buffer().Buffer;
     var OurUint8Array = (typeof global !== "undefined" ? global : typeof window !== "undefined" ? window : typeof self !== "undefined" ? self : {}).Uint8Array || function() {
     };
     function _uint8ArrayToBuffer(chunk) {
-      return Buffer2.from(chunk);
+      return Buffer3.from(chunk);
     }
     function _isUint8Array(obj) {
-      return Buffer2.isBuffer(obj) || obj instanceof OurUint8Array;
+      return Buffer3.isBuffer(obj) || obj instanceof OurUint8Array;
     }
     var debugUtil = require_util();
     var debug;
@@ -6304,7 +6388,7 @@ var require_stream_readable = __commonJS({
         if (typeof chunk === "string") {
           encoding = encoding || state.defaultEncoding;
           if (encoding !== state.encoding) {
-            chunk = Buffer2.from(chunk, encoding);
+            chunk = Buffer3.from(chunk, encoding);
             encoding = "";
           }
           skipChunkCheck = true;
@@ -6329,7 +6413,7 @@ var require_stream_readable = __commonJS({
         if (er) {
           errorOrDestroy(stream, er);
         } else if (state.objectMode || chunk && chunk.length > 0) {
-          if (typeof chunk !== "string" && !state.objectMode && Object.getPrototypeOf(chunk) !== Buffer2.prototype) {
+          if (typeof chunk !== "string" && !state.objectMode && Object.getPrototypeOf(chunk) !== Buffer3.prototype) {
             chunk = _uint8ArrayToBuffer(chunk);
           }
           if (addToFront) {
@@ -6914,6 +6998,7 @@ var require_stream_readable = __commonJS({
 var require_stream_transform = __commonJS({
   "node_modules/readable-stream/lib/_stream_transform.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = Transform;
     var _require$codes = require_errors_browser().codes;
     var ERR_METHOD_NOT_IMPLEMENTED = _require$codes.ERR_METHOD_NOT_IMPLEMENTED;
@@ -7015,6 +7100,7 @@ var require_stream_transform = __commonJS({
 var require_stream_passthrough = __commonJS({
   "node_modules/readable-stream/lib/_stream_passthrough.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = PassThrough2;
     var Transform = require_stream_transform();
     require_inherits_browser()(PassThrough2, Transform);
@@ -7032,6 +7118,7 @@ var require_stream_passthrough = __commonJS({
 var require_pipeline = __commonJS({
   "node_modules/readable-stream/lib/internal/streams/pipeline.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var eos;
     function once(callback) {
       var called = false;
@@ -7116,6 +7203,7 @@ var require_pipeline = __commonJS({
 // node_modules/stream-browserify/index.js
 var require_stream_browserify = __commonJS({
   "node_modules/stream-browserify/index.js"(exports, module) {
+    init_buffer_global();
     module.exports = Stream;
     var EE = require_events().EventEmitter;
     var inherits = require_inherits_browser();
@@ -7194,6 +7282,7 @@ var require_stream_browserify = __commonJS({
 var require_errors = __commonJS({
   "node_modules/assert/build/internal/errors.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function _typeof(o2) {
       "@babel/helpers - typeof";
       return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -7432,6 +7521,7 @@ var require_errors = __commonJS({
 var require_assertion_error = __commonJS({
   "node_modules/assert/build/internal/assert/assertion_error.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function ownKeys(e2, r2) {
       var t8 = Object.keys(e2);
       if (Object.getOwnPropertySymbols) {
@@ -7934,6 +8024,7 @@ var require_assertion_error = __commonJS({
 var require_isArguments = __commonJS({
   "node_modules/object-keys/isArguments.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var toStr = Object.prototype.toString;
     module.exports = function isArguments(value) {
       var str = toStr.call(value);
@@ -7950,6 +8041,7 @@ var require_isArguments = __commonJS({
 var require_implementation2 = __commonJS({
   "node_modules/object-keys/implementation.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var keysShim;
     if (!Object.keys) {
       has = Object.prototype.hasOwnProperty;
@@ -8082,6 +8174,7 @@ var require_implementation2 = __commonJS({
 var require_object_keys = __commonJS({
   "node_modules/object-keys/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var slice = Array.prototype.slice;
     var isArgs = require_isArguments();
     var origKeys = Object.keys;
@@ -8116,6 +8209,7 @@ var require_object_keys = __commonJS({
 var require_implementation3 = __commonJS({
   "node_modules/object.assign/implementation.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var objectKeys = require_object_keys();
     var hasSymbols = require_shams()();
     var callBound = require_call_bound();
@@ -8161,6 +8255,7 @@ var require_implementation3 = __commonJS({
 var require_polyfill = __commonJS({
   "node_modules/object.assign/polyfill.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var implementation = require_implementation3();
     var lacksProperEnumerationOrder = function() {
       if (!Object.assign) {
@@ -8210,6 +8305,7 @@ var require_polyfill = __commonJS({
 var require_implementation4 = __commonJS({
   "node_modules/object-is/implementation.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var numberIsNaN = function(value) {
       return value !== value;
     };
@@ -8232,6 +8328,7 @@ var require_implementation4 = __commonJS({
 var require_polyfill2 = __commonJS({
   "node_modules/object-is/polyfill.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var implementation = require_implementation4();
     module.exports = function getPolyfill() {
       return typeof Object.is === "function" ? Object.is : implementation;
@@ -8243,6 +8340,7 @@ var require_polyfill2 = __commonJS({
 var require_callBound = __commonJS({
   "node_modules/call-bind/callBound.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var GetIntrinsic = require_get_intrinsic();
     var callBind = require_call_bind();
     var $indexOf = callBind(GetIntrinsic("String.prototype.indexOf"));
@@ -8260,6 +8358,7 @@ var require_callBound = __commonJS({
 var require_define_properties = __commonJS({
   "node_modules/define-properties/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var keys = require_object_keys();
     var hasSymbols = typeof Symbol === "function" && typeof /* @__PURE__ */ Symbol("foo") === "symbol";
     var toStr = Object.prototype.toString;
@@ -8304,6 +8403,7 @@ var require_define_properties = __commonJS({
 var require_shim = __commonJS({
   "node_modules/object-is/shim.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var getPolyfill = require_polyfill2();
     var define = require_define_properties();
     module.exports = function shimObjectIs() {
@@ -8322,6 +8422,7 @@ var require_shim = __commonJS({
 var require_object_is = __commonJS({
   "node_modules/object-is/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var define = require_define_properties();
     var callBind = require_call_bind();
     var implementation = require_implementation4();
@@ -8341,6 +8442,7 @@ var require_object_is = __commonJS({
 var require_implementation5 = __commonJS({
   "node_modules/is-nan/implementation.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = function isNaN2(value) {
       return value !== value;
     };
@@ -8351,6 +8453,7 @@ var require_implementation5 = __commonJS({
 var require_polyfill3 = __commonJS({
   "node_modules/is-nan/polyfill.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var implementation = require_implementation5();
     module.exports = function getPolyfill() {
       if (Number.isNaN && Number.isNaN(NaN) && !Number.isNaN("a")) {
@@ -8365,6 +8468,7 @@ var require_polyfill3 = __commonJS({
 var require_shim2 = __commonJS({
   "node_modules/is-nan/shim.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var define = require_define_properties();
     var getPolyfill = require_polyfill3();
     module.exports = function shimNumberIsNaN() {
@@ -8383,6 +8487,7 @@ var require_shim2 = __commonJS({
 var require_is_nan = __commonJS({
   "node_modules/is-nan/index.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var callBind = require_call_bind();
     var define = require_define_properties();
     var implementation = require_implementation5();
@@ -8402,6 +8507,7 @@ var require_is_nan = __commonJS({
 var require_comparisons = __commonJS({
   "node_modules/assert/build/internal/util/comparisons.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function _slicedToArray(arr, i2) {
       return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i2) || _unsupportedIterableToArray(arr, i2) || _nonIterableRest();
     }
@@ -8923,6 +9029,7 @@ var require_comparisons = __commonJS({
 var require_assert = __commonJS({
   "node_modules/assert/build/assert.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function _typeof(o2) {
       "@babel/helpers - typeof";
       return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o3) {
@@ -9455,6 +9562,7 @@ var require_assert = __commonJS({
 var require_zstream = __commonJS({
   "node_modules/pako/lib/zlib/zstream.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function ZStream() {
       this.input = null;
       this.next_in = 0;
@@ -9477,6 +9585,7 @@ var require_zstream = __commonJS({
 var require_common = __commonJS({
   "node_modules/pako/lib/utils/common.js"(exports) {
     "use strict";
+    init_buffer_global();
     var TYPED_OK = typeof Uint8Array !== "undefined" && typeof Uint16Array !== "undefined" && typeof Int32Array !== "undefined";
     function _has(obj, key) {
       return Object.prototype.hasOwnProperty.call(obj, key);
@@ -9568,6 +9677,7 @@ var require_common = __commonJS({
 var require_trees = __commonJS({
   "node_modules/pako/lib/zlib/trees.js"(exports) {
     "use strict";
+    init_buffer_global();
     var utils = require_common();
     var Z_FIXED = 4;
     var Z_BINARY = 0;
@@ -10210,6 +10320,7 @@ var require_trees = __commonJS({
 var require_adler32 = __commonJS({
   "node_modules/pako/lib/zlib/adler32.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function adler32(adler, buf, len, pos) {
       var s1 = adler & 65535 | 0, s2 = adler >>> 16 & 65535 | 0, n2 = 0;
       while (len !== 0) {
@@ -10232,6 +10343,7 @@ var require_adler32 = __commonJS({
 var require_crc32 = __commonJS({
   "node_modules/pako/lib/zlib/crc32.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     function makeTable() {
       var c2, table = [];
       for (var n2 = 0; n2 < 256; n2++) {
@@ -10260,6 +10372,7 @@ var require_crc32 = __commonJS({
 var require_messages = __commonJS({
   "node_modules/pako/lib/zlib/messages.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = {
       2: "need dictionary",
       /* Z_NEED_DICT       2  */
@@ -10287,6 +10400,7 @@ var require_messages = __commonJS({
 var require_deflate = __commonJS({
   "node_modules/pako/lib/zlib/deflate.js"(exports) {
     "use strict";
+    init_buffer_global();
     var utils = require_common();
     var trees = require_trees();
     var adler32 = require_adler32();
@@ -11336,6 +11450,7 @@ var require_deflate = __commonJS({
 var require_inffast = __commonJS({
   "node_modules/pako/lib/zlib/inffast.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var BAD = 30;
     var TYPE = 12;
     module.exports = function inflate_fast(strm, start) {
@@ -11565,6 +11680,7 @@ var require_inffast = __commonJS({
 var require_inftrees = __commonJS({
   "node_modules/pako/lib/zlib/inftrees.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     var utils = require_common();
     var MAXBITS = 15;
     var ENOUGH_LENS = 852;
@@ -11881,6 +11997,7 @@ var require_inftrees = __commonJS({
 var require_inflate = __commonJS({
   "node_modules/pako/lib/zlib/inflate.js"(exports) {
     "use strict";
+    init_buffer_global();
     var utils = require_common();
     var adler32 = require_adler32();
     var crc32 = require_crc32();
@@ -13120,6 +13237,7 @@ var require_inflate = __commonJS({
 var require_constants = __commonJS({
   "node_modules/pako/lib/zlib/constants.js"(exports, module) {
     "use strict";
+    init_buffer_global();
     module.exports = {
       /* Allowed flush values; see deflate() and inflate() below for details */
       Z_NO_FLUSH: 0,
@@ -13167,6 +13285,7 @@ var require_constants = __commonJS({
 var require_binding = __commonJS({
   "node_modules/browserify-zlib/lib/binding.js"(exports) {
     "use strict";
+    init_buffer_global();
     var assert = require_assert();
     var Zstream = require_zstream();
     var zlib_deflate = require_deflate();
@@ -13487,7 +13606,8 @@ var require_binding = __commonJS({
 var require_lib = __commonJS({
   "node_modules/browserify-zlib/lib/index.js"(exports) {
     "use strict";
-    var Buffer2 = require_buffer().Buffer;
+    init_buffer_global();
+    var Buffer3 = require_buffer().Buffer;
     var Transform = require_stream_browserify().Transform;
     var binding = require_binding();
     var util = require_util();
@@ -13666,7 +13786,7 @@ var require_lib = __commonJS({
         if (nread >= kMaxLength) {
           err = new RangeError(kRangeErrorMessage);
         } else {
-          buf = Buffer2.concat(buffers, nread);
+          buf = Buffer3.concat(buffers, nread);
         }
         buffers = [];
         engine.close();
@@ -13674,8 +13794,8 @@ var require_lib = __commonJS({
       }
     }
     function zlibBufferSync(engine, buffer) {
-      if (typeof buffer === "string") buffer = Buffer2.from(buffer);
-      if (!Buffer2.isBuffer(buffer)) throw new TypeError("Not a string or buffer");
+      if (typeof buffer === "string") buffer = Buffer3.from(buffer);
+      if (!Buffer3.isBuffer(buffer)) throw new TypeError("Not a string or buffer");
       var flushFlag = engine._finishFlushFlag;
       return engine._processChunk(buffer, flushFlag);
     }
@@ -13749,7 +13869,7 @@ var require_lib = __commonJS({
         }
       }
       if (opts.dictionary) {
-        if (!Buffer2.isBuffer(opts.dictionary)) {
+        if (!Buffer3.isBuffer(opts.dictionary)) {
           throw new Error("Invalid dictionary: it should be a Buffer instance");
         }
       }
@@ -13769,7 +13889,7 @@ var require_lib = __commonJS({
       var strategy = exports.Z_DEFAULT_STRATEGY;
       if (typeof opts.strategy === "number") strategy = opts.strategy;
       this._handle.init(opts.windowBits || exports.Z_DEFAULT_WINDOWBITS, level, opts.memLevel || exports.Z_DEFAULT_MEMLEVEL, strategy, opts.dictionary);
-      this._buffer = Buffer2.allocUnsafe(this._chunkSize);
+      this._buffer = Buffer3.allocUnsafe(this._chunkSize);
       this._offset = 0;
       this._level = level;
       this._strategy = strategy;
@@ -13810,7 +13930,7 @@ var require_lib = __commonJS({
       return this._handle.reset();
     };
     Zlib.prototype._flush = function(callback) {
-      this._transform(Buffer2.alloc(0), "", callback);
+      this._transform(Buffer3.alloc(0), "", callback);
     };
     Zlib.prototype.flush = function(kind, callback) {
       var _this2 = this;
@@ -13831,7 +13951,7 @@ var require_lib = __commonJS({
         }
       } else {
         this._flushFlag = kind;
-        this.write(Buffer2.alloc(0), "", callback);
+        this.write(Buffer3.alloc(0), "", callback);
       }
     };
     Zlib.prototype.close = function(callback) {
@@ -13852,7 +13972,7 @@ var require_lib = __commonJS({
       var ws = this._writableState;
       var ending = ws.ending || ws.ended;
       var last = ending && (!chunk || ws.length === chunk.length);
-      if (chunk !== null && !Buffer2.isBuffer(chunk)) return cb2(new Error("invalid input"));
+      if (chunk !== null && !Buffer3.isBuffer(chunk)) return cb2(new Error("invalid input"));
       if (!this._handle) return cb2(new Error("zlib binding closed"));
       if (last) flushFlag = this._finishFlushFlag;
       else {
@@ -13900,7 +14020,7 @@ var require_lib = __commonJS({
           _close(this);
           throw new RangeError(kRangeErrorMessage);
         }
-        var buf = Buffer2.concat(buffers, nread);
+        var buf = Buffer3.concat(buffers, nread);
         _close(this);
         return buf;
       }
@@ -13942,7 +14062,7 @@ var require_lib = __commonJS({
         if (availOutAfter === 0 || self2._offset >= self2._chunkSize) {
           availOutBefore = self2._chunkSize;
           self2._offset = 0;
-          self2._buffer = Buffer2.allocUnsafe(self2._chunkSize);
+          self2._buffer = Buffer3.allocUnsafe(self2._chunkSize);
         }
         if (availOutAfter === 0) {
           inOff += availInBefore - availInAfter;
@@ -13970,6 +14090,7 @@ var require_lib = __commonJS({
 // node_modules/pend/index.js
 var require_pend = __commonJS({
   "node_modules/pend/index.js"(exports, module) {
+    init_buffer_global();
     module.exports = Pend;
     function Pend() {
       this.pending = 0;
@@ -14025,6 +14146,7 @@ var require_pend = __commonJS({
 // node_modules/yauzl/fd-slicer.js
 var require_fd_slicer = __commonJS({
   "node_modules/yauzl/fd-slicer.js"(exports) {
+    init_buffer_global();
     var fs = (init_fs_stub(), __toCommonJS(fs_stub_exports));
     var util = require_util();
     var stream = require_stream_browserify();
@@ -14295,7 +14417,8 @@ var require_fd_slicer = __commonJS({
 // node_modules/buffer-crc32/index.js
 var require_buffer_crc32 = __commonJS({
   "node_modules/buffer-crc32/index.js"(exports, module) {
-    var Buffer2 = require_buffer().Buffer;
+    init_buffer_global();
+    var Buffer3 = require_buffer().Buffer;
     var CRC_TABLE = [
       0,
       1996959894,
@@ -14558,14 +14681,14 @@ var require_buffer_crc32 = __commonJS({
       CRC_TABLE = new Int32Array(CRC_TABLE);
     }
     function ensureBuffer(input) {
-      if (Buffer2.isBuffer(input)) {
+      if (Buffer3.isBuffer(input)) {
         return input;
       }
-      var hasNewBufferAPI = typeof Buffer2.alloc === "function" && typeof Buffer2.from === "function";
+      var hasNewBufferAPI = typeof Buffer3.alloc === "function" && typeof Buffer3.from === "function";
       if (typeof input === "number") {
-        return hasNewBufferAPI ? Buffer2.alloc(input) : new Buffer2(input);
+        return hasNewBufferAPI ? Buffer3.alloc(input) : new Buffer3(input);
       } else if (typeof input === "string") {
-        return hasNewBufferAPI ? Buffer2.from(input) : new Buffer2(input);
+        return hasNewBufferAPI ? Buffer3.from(input) : new Buffer3(input);
       } else {
         throw new Error("input must be buffer, number, or string, received " + typeof input);
       }
@@ -14577,7 +14700,7 @@ var require_buffer_crc32 = __commonJS({
     }
     function _crc32(buf, previous) {
       buf = ensureBuffer(buf);
-      if (Buffer2.isBuffer(previous)) {
+      if (Buffer3.isBuffer(previous)) {
         previous = previous.readUInt32BE(0);
       }
       var crc = ~~previous ^ -1;
@@ -14602,6 +14725,7 @@ var require_buffer_crc32 = __commonJS({
 // node_modules/yauzl/index.js
 var require_yauzl = __commonJS({
   "node_modules/yauzl/index.js"(exports) {
+    init_buffer_global();
     var fs = (init_fs_stub(), __toCommonJS(fs_stub_exports));
     var zlib = require_lib();
     var fd_slicer = require_fd_slicer();
@@ -15347,6 +15471,7 @@ var require_yauzl = __commonJS({
 var fromUtf8;
 var init_fromUtf8_browser = __esm({
   "node_modules/@smithy/util-utf8/dist-es/fromUtf8.browser.js"() {
+    init_buffer_global();
     fromUtf8 = (input) => new TextEncoder().encode(input);
   }
 });
@@ -15355,6 +15480,7 @@ var init_fromUtf8_browser = __esm({
 var toUint8Array;
 var init_toUint8Array = __esm({
   "node_modules/@smithy/util-utf8/dist-es/toUint8Array.js"() {
+    init_buffer_global();
     init_fromUtf8_browser();
     toUint8Array = (data) => {
       if (typeof data === "string") {
@@ -15372,6 +15498,7 @@ var init_toUint8Array = __esm({
 var toUtf8;
 var init_toUtf8_browser = __esm({
   "node_modules/@smithy/util-utf8/dist-es/toUtf8.browser.js"() {
+    init_buffer_global();
     toUtf8 = (input) => {
       if (typeof input === "string") {
         return input;
@@ -15387,6 +15514,7 @@ var init_toUtf8_browser = __esm({
 // node_modules/@smithy/util-utf8/dist-es/index.js
 var init_dist_es = __esm({
   "node_modules/@smithy/util-utf8/dist-es/index.js"() {
+    init_buffer_global();
     init_fromUtf8_browser();
     init_toUint8Array();
     init_toUtf8_browser();
@@ -15397,6 +15525,7 @@ var init_dist_es = __esm({
 var EventStreamSerde;
 var init_EventStreamSerde = __esm({
   "node_modules/@smithy/core/dist-es/submodules/event-streams/EventStreamSerde.js"() {
+    init_buffer_global();
     init_dist_es();
     EventStreamSerde = class {
       marshaller;
@@ -15642,14 +15771,23 @@ __export(event_streams_exports, {
 });
 var init_event_streams = __esm({
   "node_modules/@smithy/core/dist-es/submodules/event-streams/index.js"() {
+    init_buffer_global();
     init_EventStreamSerde();
   }
 });
 
 // s3ZipReader.ts
+init_buffer_global();
 var import_yauzl = __toESM(require_yauzl());
 
+// node_modules/@aws-sdk/client-s3/dist-es/S3Client.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/middleware-expect-continue/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
+init_buffer_global();
 var getHttpHandlerExtensionConfiguration = (runtimeConfig) => {
   return {
     setHttpHandler(handler) {
@@ -15673,13 +15811,18 @@ var resolveHttpHandlerRuntimeConfig = (httpHandlerExtensionConfiguration) => {
 };
 
 // node_modules/@smithy/types/dist-es/endpoint.js
+init_buffer_global();
 var EndpointURLScheme;
 (function(EndpointURLScheme2) {
   EndpointURLScheme2["HTTP"] = "http";
   EndpointURLScheme2["HTTPS"] = "https";
 })(EndpointURLScheme || (EndpointURLScheme = {}));
 
+// node_modules/@smithy/types/dist-es/extensions/index.js
+init_buffer_global();
+
 // node_modules/@smithy/types/dist-es/extensions/checksum.js
+init_buffer_global();
 var AlgorithmId;
 (function(AlgorithmId2) {
   AlgorithmId2["MD5"] = "md5";
@@ -15690,9 +15833,11 @@ var AlgorithmId;
 })(AlgorithmId || (AlgorithmId = {}));
 
 // node_modules/@smithy/types/dist-es/middleware.js
+init_buffer_global();
 var SMITHY_CONTEXT_KEY = "__smithy_context";
 
 // node_modules/@smithy/protocol-http/dist-es/httpRequest.js
+init_buffer_global();
 var HttpRequest = class _HttpRequest {
   method;
   protocol;
@@ -15750,6 +15895,7 @@ function cloneQuery(query) {
 }
 
 // node_modules/@smithy/protocol-http/dist-es/httpResponse.js
+init_buffer_global();
 var HttpResponse = class {
   statusCode;
   reason;
@@ -15807,6 +15953,7 @@ var getAddExpectContinuePlugin = (options2) => ({
 });
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/constants.js
+init_buffer_global();
 var RequestChecksumCalculation = {
   WHEN_SUPPORTED: "WHEN_SUPPORTED",
   WHEN_REQUIRED: "WHEN_REQUIRED"
@@ -15833,7 +15980,11 @@ var ChecksumLocation;
 })(ChecksumLocation || (ChecksumLocation = {}));
 var DEFAULT_CHECKSUM_ALGORITHM = ChecksumAlgorithm.CRC32;
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/flexibleChecksumsMiddleware.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
+init_buffer_global();
 function setCredentialFeature(credentials, feature, value) {
   if (!credentials.$source) {
     credentials.$source = {};
@@ -15843,6 +15994,7 @@ function setCredentialFeature(credentials, feature, value) {
 }
 
 // node_modules/@aws-sdk/core/dist-es/submodules/client/setFeature.js
+init_buffer_global();
 function setFeature(context, feature, value) {
   if (!context.__aws_sdk_context) {
     context.__aws_sdk_context = {
@@ -15854,7 +16006,14 @@ function setFeature(context, feature, value) {
   context.__aws_sdk_context.features[feature] = value;
 }
 
+// node_modules/@smithy/util-stream/dist-es/blob/Uint8ArrayBlobAdapter.js
+init_buffer_global();
+
+// node_modules/@smithy/util-base64/dist-es/fromBase64.browser.js
+init_buffer_global();
+
 // node_modules/@smithy/util-base64/dist-es/constants.browser.js
+init_buffer_global();
 var chars = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`;
 var alphabetByEncoding = Object.entries(chars).reduce((acc, [i2, c2]) => {
   acc[c2] = Number(i2);
@@ -15901,6 +16060,7 @@ var fromBase64 = (input) => {
 };
 
 // node_modules/@smithy/util-base64/dist-es/toBase64.browser.js
+init_buffer_global();
 init_dist_es();
 function toBase64(_input) {
   let input;
@@ -15958,12 +16118,17 @@ var Uint8ArrayBlobAdapter = class _Uint8ArrayBlobAdapter extends Uint8Array {
 };
 
 // node_modules/@smithy/util-stream/dist-es/checksum/ChecksumStream.browser.js
+init_buffer_global();
 var ReadableStreamRef = typeof ReadableStream === "function" ? ReadableStream : function() {
 };
 var ChecksumStream = class extends ReadableStreamRef {
 };
 
+// node_modules/@smithy/util-stream/dist-es/checksum/createChecksumStream.browser.js
+init_buffer_global();
+
 // node_modules/@smithy/util-stream/dist-es/stream-type-check.js
+init_buffer_global();
 var isReadableStream = (stream) => typeof ReadableStream === "function" && (stream?.constructor?.name === ReadableStream.name || stream instanceof ReadableStream);
 
 // node_modules/@smithy/util-stream/dist-es/checksum/createChecksumStream.browser.js
@@ -15999,7 +16164,11 @@ var createChecksumStream = ({ expectedChecksum, checksum, source, checksumSource
   return readable;
 };
 
+// node_modules/@smithy/util-stream/dist-es/createBufferedReadableStream.js
+init_buffer_global();
+
 // node_modules/@smithy/util-stream/dist-es/ByteArrayCollector.js
+init_buffer_global();
 var ByteArrayCollector = class {
   allocByteArray;
   byteLength = 0;
@@ -16127,6 +16296,7 @@ function modeOf(chunk, allowBuffer = true) {
 }
 
 // node_modules/@smithy/util-stream/dist-es/getAwsChunkedEncodingStream.browser.js
+init_buffer_global();
 var getAwsChunkedEncodingStream = (readableStream, options2) => {
   const { base64Encoder, bodyLengthChecker, checksumAlgorithmFn, checksumLocationName, streamHasher } = options2;
   const checksumRequired = base64Encoder !== void 0 && bodyLengthChecker !== void 0 && checksumAlgorithmFn !== void 0 && checksumLocationName !== void 0 && streamHasher !== void 0;
@@ -16156,6 +16326,7 @@ ${value}\r
 };
 
 // node_modules/@smithy/util-stream/dist-es/headStream.browser.js
+init_buffer_global();
 async function headStream(stream, bytes) {
   let byteLengthCounter = 0;
   const chunks = [];
@@ -16187,7 +16358,17 @@ async function headStream(stream, bytes) {
   return collected;
 }
 
+// node_modules/@smithy/util-stream/dist-es/sdk-stream-mixin.browser.js
+init_buffer_global();
+
+// node_modules/@smithy/fetch-http-handler/dist-es/fetch-http-handler.js
+init_buffer_global();
+
+// node_modules/@smithy/querystring-builder/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@smithy/util-uri-escape/dist-es/escape-uri.js
+init_buffer_global();
 var escapeUri = (uri) => encodeURIComponent(uri).replace(/[!'()*]/g, hexEncode);
 var hexEncode = (c2) => `%${c2.charCodeAt(0).toString(16).toUpperCase()}`;
 
@@ -16213,11 +16394,13 @@ function buildQueryString(query) {
 }
 
 // node_modules/@smithy/fetch-http-handler/dist-es/create-request.js
+init_buffer_global();
 function createRequest(url, requestOptions) {
   return new Request(url, requestOptions);
 }
 
 // node_modules/@smithy/fetch-http-handler/dist-es/request-timeout.js
+init_buffer_global();
 function requestTimeout(timeoutInMs = 0) {
   return new Promise((resolve, reject) => {
     if (timeoutInMs) {
@@ -16384,6 +16567,7 @@ function buildAbortError(abortSignal) {
 }
 
 // node_modules/@smithy/fetch-http-handler/dist-es/stream-collector.js
+init_buffer_global();
 var streamCollector = async (stream) => {
   if (typeof Blob === "function" && stream instanceof Blob || stream.constructor?.name === "Blob") {
     if (Blob.prototype.arrayBuffer !== void 0) {
@@ -16438,6 +16622,7 @@ function readToBase64(blob) {
 }
 
 // node_modules/@smithy/util-hex-encoding/dist-es/index.js
+init_buffer_global();
 var SHORT_TO_HEX = {};
 var HEX_TO_SHORT = {};
 for (let i2 = 0; i2 < 256; i2++) {
@@ -16527,6 +16712,7 @@ var sdkStreamMixin = (stream) => {
 var isBlobInstance = (stream) => typeof Blob === "function" && stream instanceof Blob;
 
 // node_modules/@smithy/util-stream/dist-es/splitStream.browser.js
+init_buffer_global();
 async function splitStream(stream) {
   if (typeof stream.stream === "function") {
     stream = stream.stream();
@@ -16536,6 +16722,7 @@ async function splitStream(stream) {
 }
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getChecksumAlgorithmForRequest.js
+init_buffer_global();
 var getChecksumAlgorithmForRequest = (input, { requestChecksumRequired, requestAlgorithmMember, requestChecksumCalculation }) => {
   if (!requestAlgorithmMember) {
     return requestChecksumCalculation === RequestChecksumCalculation.WHEN_SUPPORTED || requestChecksumRequired ? DEFAULT_CHECKSUM_ALGORITHM : void 0;
@@ -16548,9 +16735,11 @@ var getChecksumAlgorithmForRequest = (input, { requestChecksumRequired, requestA
 };
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getChecksumLocationName.js
+init_buffer_global();
 var getChecksumLocationName = (algorithm) => algorithm === ChecksumAlgorithm.MD5 ? "content-md5" : `x-amz-checksum-${algorithm.toLowerCase()}`;
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/hasHeader.js
+init_buffer_global();
 var hasHeader = (header, headers) => {
   const soughtHeader = header.toLowerCase();
   for (const headerName of Object.keys(headers)) {
@@ -16562,6 +16751,7 @@ var hasHeader = (header, headers) => {
 };
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/hasHeaderWithPrefix.js
+init_buffer_global();
 var hasHeaderWithPrefix = (headerPrefix, headers) => {
   const soughtHeaderPrefix = headerPrefix.toLowerCase();
   for (const headerName of Object.keys(headers)) {
@@ -16572,13 +16762,24 @@ var hasHeaderWithPrefix = (headerPrefix, headers) => {
   return false;
 };
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/isStreaming.js
+init_buffer_global();
+
 // node_modules/@smithy/is-array-buffer/dist-es/index.js
+init_buffer_global();
 var isArrayBuffer = (arg) => typeof ArrayBuffer === "function" && arg instanceof ArrayBuffer || Object.prototype.toString.call(arg) === "[object ArrayBuffer]";
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/isStreaming.js
 var isStreaming = (body) => body !== void 0 && typeof body !== "string" && !ArrayBuffer.isView(body) && !isArrayBuffer(body);
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/selectChecksumAlgorithmFunction.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/crc32c/build/module/index.js
+init_buffer_global();
+
 // node_modules/tslib/tslib.es6.mjs
+init_buffer_global();
 function __awaiter(thisArg, _arguments, P2, generator) {
   function adopt(value) {
     return value instanceof P2 ? value : new P2(function(resolve) {
@@ -16687,8 +16888,24 @@ function __values(o2) {
   throw new TypeError(s2 ? "Object is not iterable." : "Symbol.iterator is not defined.");
 }
 
+// node_modules/@aws-crypto/util/build/module/index.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/util/build/module/convertToBuffer.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/util/node_modules/@smithy/util-utf8/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/util/node_modules/@smithy/util-utf8/dist-es/fromUtf8.browser.js
+init_buffer_global();
 var fromUtf82 = (input) => new TextEncoder().encode(input);
+
+// node_modules/@aws-crypto/util/node_modules/@smithy/util-utf8/dist-es/toUint8Array.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/util/node_modules/@smithy/util-utf8/dist-es/toUtf8.browser.js
+init_buffer_global();
 
 // node_modules/@aws-crypto/util/build/module/convertToBuffer.js
 var fromUtf83 = typeof Buffer !== "undefined" && Buffer.from ? function(input) {
@@ -16707,6 +16924,7 @@ function convertToBuffer(data) {
 }
 
 // node_modules/@aws-crypto/util/build/module/isEmptyData.js
+init_buffer_global();
 function isEmptyData(data) {
   if (typeof data === "string") {
     return data.length === 0;
@@ -16715,6 +16933,7 @@ function isEmptyData(data) {
 }
 
 // node_modules/@aws-crypto/util/build/module/numToUint8.js
+init_buffer_global();
 function numToUint8(num) {
   return new Uint8Array([
     (num & 4278190080) >> 24,
@@ -16725,6 +16944,7 @@ function numToUint8(num) {
 }
 
 // node_modules/@aws-crypto/util/build/module/uint32ArrayFrom.js
+init_buffer_global();
 function uint32ArrayFrom(a_lookUpTable2) {
   if (!Uint32Array.from) {
     var return_array = new Uint32Array(a_lookUpTable2.length);
@@ -16739,6 +16959,7 @@ function uint32ArrayFrom(a_lookUpTable2) {
 }
 
 // node_modules/@aws-crypto/crc32c/build/module/aws_crc32c.js
+init_buffer_global();
 var AwsCrc32c = (
   /** @class */
   (function() {
@@ -17055,7 +17276,11 @@ var a_lookupTable = [
 ];
 var lookupTable = uint32ArrayFrom(a_lookupTable);
 
+// node_modules/@aws-sdk/crc64-nvme/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/crc64-nvme/dist-es/Crc64Nvme.js
+init_buffer_global();
 var generateCRC64NVMETable = () => {
   const sliceLength = 8;
   const tables = new Array(sliceLength);
@@ -17147,11 +17372,19 @@ var Crc64Nvme = class {
 };
 
 // node_modules/@aws-sdk/crc64-nvme/dist-es/crc64-nvme-crt-container.js
+init_buffer_global();
 var crc64NvmeCrtContainer = {
   CrtCrc64Nvme: null
 };
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getCrc32ChecksumAlgorithmFunction.browser.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/crc32/build/module/index.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/crc32/build/module/aws_crc32.js
+init_buffer_global();
 var AwsCrc32 = (
   /** @class */
   (function() {
@@ -17472,6 +17705,7 @@ var lookupTable2 = uint32ArrayFrom(a_lookUpTable);
 var getCrc32ChecksumAlgorithmFunction = () => AwsCrc32;
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/types.js
+init_buffer_global();
 var CLIENT_SUPPORTED_ALGORITHMS = [
   ChecksumAlgorithm.CRC32,
   ChecksumAlgorithm.CRC32C,
@@ -17515,6 +17749,7 @@ var selectChecksumAlgorithmFunction = (checksumAlgorithm, config) => {
 };
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/stringHasher.js
+init_buffer_global();
 init_dist_es();
 var stringHasher = (checksumAlgorithmFn, body) => {
   const hash = new checksumAlgorithmFn();
@@ -17628,7 +17863,11 @@ var flexibleChecksumsMiddleware = (config, middlewareConfig) => (next, context) 
   }
 };
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getFlexibleChecksumsPlugin.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/flexibleChecksumsInputMiddleware.js
+init_buffer_global();
 var flexibleChecksumsInputMiddlewareOptions = {
   name: "flexibleChecksumsInputMiddleware",
   toMiddleware: "serializerMiddleware",
@@ -17665,7 +17904,11 @@ var flexibleChecksumsInputMiddleware = (config, middlewareConfig) => (next, cont
   return next(args);
 };
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/flexibleChecksumsResponseMiddleware.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getChecksumAlgorithmListForResponse.js
+init_buffer_global();
 var getChecksumAlgorithmListForResponse = (responseAlgorithms = []) => {
   const validChecksumAlgorithms = [];
   let i2 = PRIORITY_ORDER_ALGORITHMS.length;
@@ -17681,6 +17924,7 @@ var getChecksumAlgorithmListForResponse = (responseAlgorithms = []) => {
 };
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/isChecksumWithPartNumber.js
+init_buffer_global();
 var isChecksumWithPartNumber = (checksum) => {
   const lastHyphenIndex = checksum.lastIndexOf("-");
   if (lastHyphenIndex !== -1) {
@@ -17695,7 +17939,11 @@ var isChecksumWithPartNumber = (checksum) => {
   return false;
 };
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/validateChecksumFromResponse.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/getChecksum.js
+init_buffer_global();
 var getChecksum = async (body, { checksumAlgorithmFn, base64Encoder }) => base64Encoder(await stringHasher(checksumAlgorithmFn, body));
 
 // node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/validateChecksumFromResponse.js
@@ -17788,10 +18036,15 @@ var getFlexibleChecksumsPlugin = (config, middlewareConfig) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-flexible-checksums/dist-es/resolveFlexibleChecksumsConfig.js
+init_buffer_global();
+
 // node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
+init_buffer_global();
 var getSmithyContext = (context) => context[SMITHY_CONTEXT_KEY] || (context[SMITHY_CONTEXT_KEY] = {});
 
 // node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
+init_buffer_global();
 var normalizeProvider = (input) => {
   if (typeof input === "function")
     return input;
@@ -17811,6 +18064,7 @@ var resolveFlexibleChecksumsConfig = (input) => {
 };
 
 // node_modules/@aws-sdk/middleware-host-header/dist-es/index.js
+init_buffer_global();
 function resolveHostHeaderConfig(input) {
   return input;
 }
@@ -17844,6 +18098,7 @@ var getHostHeaderPlugin = (options2) => ({
 });
 
 // node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
+init_buffer_global();
 var loggerMiddleware = () => (next, context) => async (args) => {
   try {
     const response = await next(args);
@@ -17886,7 +18141,11 @@ var getLoggerPlugin = (options2) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/middleware-recursion-detection/dist-es/configuration.js
+init_buffer_global();
 var recursionDetectionMiddlewareOptions = {
   step: "build",
   tags: ["RECURSION_DETECTION"],
@@ -17896,6 +18155,7 @@ var recursionDetectionMiddlewareOptions = {
 };
 
 // node_modules/@aws-sdk/middleware-recursion-detection/dist-es/recursionDetectionMiddleware.browser.js
+init_buffer_global();
 var recursionDetectionMiddleware = () => (next) => async (args) => next(args);
 
 // node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js
@@ -17905,7 +18165,14 @@ var getRecursionDetectionPlugin = (options2) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/index.js
+init_buffer_global();
+
+// node_modules/@smithy/smithy-client/dist-es/client.js
+init_buffer_global();
+
 // node_modules/@smithy/middleware-stack/dist-es/MiddlewareStack.js
+init_buffer_global();
 var getAllAliases = (name, aliases) => {
   const _aliases = [];
   if (name) {
@@ -18219,6 +18486,7 @@ var Client = class {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/protocols/collect-stream-body.js
+init_buffer_global();
 var collectBody = async (streamBody = new Uint8Array(), context) => {
   if (streamBody instanceof Uint8Array) {
     return Uint8ArrayBlobAdapter.mutate(streamBody);
@@ -18231,13 +18499,18 @@ var collectBody = async (streamBody = new Uint8Array(), context) => {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/protocols/extended-encode-uri-component.js
+init_buffer_global();
 function extendedEncodeURIComponent(str) {
   return encodeURIComponent(str).replace(/[!'()*]/g, function(c2) {
     return "%" + c2.charCodeAt(0).toString(16).toUpperCase();
   });
 }
 
+// node_modules/@smithy/core/dist-es/submodules/protocols/HttpBindingProtocol.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/schema/deref.js
+init_buffer_global();
 var deref = (schemaRef) => {
   if (typeof schemaRef === "function") {
     return schemaRef();
@@ -18245,7 +18518,14 @@ var deref = (schemaRef) => {
   return schemaRef;
 };
 
+// node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js
+init_buffer_global();
+
+// node_modules/@smithy/core/dist-es/submodules/schema/middleware/schemaDeserializationMiddleware.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/schema/schemas/operation.js
+init_buffer_global();
 var operation = (namespace, name, traits, input, output) => ({
   name,
   namespace,
@@ -18314,7 +18594,17 @@ var findHeader = (pattern, headers) => {
   }) || [void 0, void 0])[1];
 };
 
+// node_modules/@smithy/core/dist-es/submodules/schema/middleware/schemaSerializationMiddleware.js
+init_buffer_global();
+
+// node_modules/@smithy/core/dist-es/submodules/endpoints/toEndpointV1.js
+init_buffer_global();
+
+// node_modules/@smithy/url-parser/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@smithy/querystring-parser/dist-es/index.js
+init_buffer_global();
 function parseQueryString(querystring) {
   const query = {};
   querystring = querystring.replace(/^\?/, "");
@@ -18413,7 +18703,11 @@ function getSchemaSerdePlugin(config) {
   };
 }
 
+// node_modules/@smithy/core/dist-es/submodules/schema/schemas/NormalizedSchema.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/schema/schemas/translateTraits.js
+init_buffer_global();
 var traitsCache = [];
 function translateTraits(indicator) {
   if (typeof indicator === "object") {
@@ -18724,6 +19018,7 @@ var isMemberSchema = (sc) => Array.isArray(sc) && sc.length === 2;
 var isStaticSchema = (sc) => Array.isArray(sc) && sc.length >= 5;
 
 // node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
+init_buffer_global();
 var TypeRegistry = class _TypeRegistry {
   namespace;
   schemas;
@@ -18809,7 +19104,11 @@ var TypeRegistry = class _TypeRegistry {
   }
 };
 
+// node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/serde/parse-utils.js
+init_buffer_global();
 var expectNumber = (value) => {
   if (value === null || value === void 0) {
     return void 0;
@@ -19014,7 +19313,14 @@ var stripLeadingZeroes = (value) => {
   return value.slice(idx);
 };
 
+// node_modules/@smithy/core/dist-es/submodules/serde/generateIdempotencyToken.js
+init_buffer_global();
+
+// node_modules/@smithy/uuid/dist-es/v4.js
+init_buffer_global();
+
 // node_modules/@smithy/uuid/dist-es/randomUUID.browser.js
+init_buffer_global();
 var randomUUID = typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID.bind(crypto);
 
 // node_modules/@smithy/uuid/dist-es/v4.js
@@ -19031,6 +19337,7 @@ var v4 = () => {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/serde/lazy-json.js
+init_buffer_global();
 var LazyJsonString = function LazyJsonString2(val) {
   const str = Object.assign(new String(val), {
     deserializeJSON() {
@@ -19056,6 +19363,7 @@ LazyJsonString.from = (object) => {
 LazyJsonString.fromObject = LazyJsonString.from;
 
 // node_modules/@smithy/core/dist-es/submodules/serde/quote-header.js
+init_buffer_global();
 function quoteHeader(part) {
   if (part.includes(",") || part.includes('"')) {
     part = `"${part.replace(/"/g, '\\"')}"`;
@@ -19064,6 +19372,7 @@ function quoteHeader(part) {
 }
 
 // node_modules/@smithy/core/dist-es/submodules/serde/schema-serde-lib/schema-date-utils.js
+init_buffer_global();
 var ddd = `(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:[ne|u?r]?s?day)?`;
 var mmm = `(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)`;
 var time = `(\\d?\\d):(\\d{2}):(\\d{2})(?:\\.(\\d+))?`;
@@ -19163,6 +19472,7 @@ function range(v2, min, max) {
 }
 
 // node_modules/@smithy/core/dist-es/submodules/serde/split-every.js
+init_buffer_global();
 function splitEvery(value, delimiter, numDelimiters) {
   if (numDelimiters <= 0 || !Number.isInteger(numDelimiters)) {
     throw new Error("Invalid number of delimiters (" + numDelimiters + ") for splitEvery.");
@@ -19191,6 +19501,7 @@ function splitEvery(value, delimiter, numDelimiters) {
 }
 
 // node_modules/@smithy/core/dist-es/submodules/serde/split-header.js
+init_buffer_global();
 var splitHeader = (value) => {
   const z2 = value.length;
   const values = [];
@@ -19230,6 +19541,7 @@ var splitHeader = (value) => {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/serde/value/NumericValue.js
+init_buffer_global();
 var format = /^-?\d*(\.\d+)?$/;
 var NumericValue = class _NumericValue {
   string;
@@ -19253,7 +19565,11 @@ var NumericValue = class _NumericValue {
   }
 };
 
+// node_modules/@smithy/core/dist-es/submodules/protocols/HttpProtocol.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/protocols/SerdeContext.js
+init_buffer_global();
 var SerdeContext = class {
   serdeContext;
   setSerdeContext(serdeContext) {
@@ -19659,9 +19975,11 @@ var HttpBindingProtocol = class extends HttpProtocol {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/protocols/serde/FromStringShapeDeserializer.js
+init_buffer_global();
 init_dist_es();
 
 // node_modules/@smithy/core/dist-es/submodules/protocols/serde/determineTimestampFormat.js
+init_buffer_global();
 function determineTimestampFormat(ns, settings) {
   if (settings.timestampFormat.useTrait) {
     if (ns.isTimestampSchema() && (ns.getSchema() === 5 || ns.getSchema() === 6 || ns.getSchema() === 7)) {
@@ -19736,6 +20054,7 @@ var FromStringShapeDeserializer = class extends SerdeContext {
 };
 
 // node_modules/@smithy/core/dist-es/submodules/protocols/serde/HttpInterceptingShapeDeserializer.js
+init_buffer_global();
 init_dist_es();
 var HttpInterceptingShapeDeserializer = class extends SerdeContext {
   codecDeserializer;
@@ -19775,7 +20094,11 @@ var HttpInterceptingShapeDeserializer = class extends SerdeContext {
   }
 };
 
+// node_modules/@smithy/core/dist-es/submodules/protocols/serde/HttpInterceptingShapeSerializer.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/submodules/protocols/serde/ToStringShapeSerializer.js
+init_buffer_global();
 var ToStringShapeSerializer = class extends SerdeContext {
   settings;
   stringBuffer = "";
@@ -19895,7 +20218,11 @@ var HttpInterceptingShapeSerializer = class {
   }
 };
 
+// node_modules/@smithy/smithy-client/dist-es/command.js
+init_buffer_global();
+
 // node_modules/@smithy/smithy-client/dist-es/schemaLogFilter.js
+init_buffer_global();
 var SENSITIVE_STRING = "***SensitiveInformation***";
 function schemaLogFilter(schema, data) {
   if (data == null) {
@@ -20053,6 +20380,7 @@ var ClassBuilder = class {
 };
 
 // node_modules/@smithy/smithy-client/dist-es/exceptions.js
+init_buffer_global();
 var ServiceException = class _ServiceException extends Error {
   $fault;
   $response;
@@ -20100,6 +20428,7 @@ var decorateServiceException = (exception, additions = {}) => {
 };
 
 // node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
+init_buffer_global();
 var loadConfigsForDefaultMode = (mode) => {
   switch (mode) {
     case "standard":
@@ -20127,7 +20456,11 @@ var loadConfigsForDefaultMode = (mode) => {
   }
 };
 
+// node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js
+init_buffer_global();
+
 // node_modules/@smithy/smithy-client/dist-es/extensions/checksum.js
+init_buffer_global();
 var knownAlgorithms = Object.values(AlgorithmId);
 var getChecksumConfiguration = (runtimeConfig) => {
   const checksumAlgorithms = [];
@@ -20176,6 +20509,7 @@ var resolveChecksumRuntimeConfig = (clientConfig) => {
 };
 
 // node_modules/@smithy/smithy-client/dist-es/extensions/retry.js
+init_buffer_global();
 var getRetryConfiguration = (runtimeConfig) => {
   return {
     setRetryStrategy(retryStrategy) {
@@ -20201,6 +20535,7 @@ var resolveDefaultRuntimeConfig = (config) => {
 };
 
 // node_modules/@smithy/smithy-client/dist-es/get-value-from-text-node.js
+init_buffer_global();
 var getValueFromTextNode = (obj) => {
   const textNodeName = "#text";
   for (const key in obj) {
@@ -20214,6 +20549,7 @@ var getValueFromTextNode = (obj) => {
 };
 
 // node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
+init_buffer_global();
 var NoOpLogger = class {
   trace() {
   }
@@ -20228,6 +20564,7 @@ var NoOpLogger = class {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/region-redirect-endpoint-middleware.js
+init_buffer_global();
 var regionRedirectEndpointMiddleware = (config) => {
   return (next, context) => async (args) => {
     const originalRegion = await config.region();
@@ -20271,6 +20608,7 @@ var regionRedirectEndpointMiddlewareOptions = {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/region-redirect-middleware.js
+init_buffer_global();
 function regionRedirectMiddleware(clientConfig) {
   return (next, context) => async (args) => {
     try {
@@ -20311,6 +20649,7 @@ var getRegionRedirectMiddlewarePlugin = (clientConfig) => ({
 });
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-expires-middleware.js
+init_buffer_global();
 var s3ExpiresMiddleware = (config) => {
   return (next, context) => async (args) => {
     const result = await next(args);
@@ -20342,7 +20681,11 @@ var getS3ExpiresMiddlewarePlugin = (clientConfig) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/index.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/classes/S3ExpressIdentityCache.js
+init_buffer_global();
 var S3ExpressIdentityCache = class _S3ExpressIdentityCache {
   data;
   lastPurgeTime = Date.now();
@@ -20384,6 +20727,7 @@ var S3ExpressIdentityCache = class _S3ExpressIdentityCache {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/classes/S3ExpressIdentityCacheEntry.js
+init_buffer_global();
 var S3ExpressIdentityCacheEntry = class {
   _identity;
   isRefreshing;
@@ -20400,6 +20744,7 @@ var S3ExpressIdentityCacheEntry = class {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/classes/S3ExpressIdentityProviderImpl.js
+init_buffer_global();
 var S3ExpressIdentityProviderImpl = class _S3ExpressIdentityProviderImpl {
   createSessionFn;
   cache;
@@ -20448,10 +20793,15 @@ var S3ExpressIdentityProviderImpl = class _S3ExpressIdentityProviderImpl {
   }
 };
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/classes/SignatureV4S3Express.js
+init_buffer_global();
+
 // node_modules/@smithy/signature-v4/dist-es/SignatureV4.js
+init_buffer_global();
 init_dist_es();
 
 // node_modules/@smithy/signature-v4/dist-es/constants.js
+init_buffer_global();
 var ALGORITHM_QUERY_PARAM = "X-Amz-Algorithm";
 var CREDENTIAL_QUERY_PARAM = "X-Amz-Credential";
 var AMZ_DATE_QUERY_PARAM = "X-Amz-Date";
@@ -20493,6 +20843,7 @@ var KEY_TYPE_IDENTIFIER = "aws4_request";
 var MAX_PRESIGNED_TTL = 60 * 60 * 24 * 7;
 
 // node_modules/@smithy/signature-v4/dist-es/credentialDerivation.js
+init_buffer_global();
 init_dist_es();
 var signingKeyCache = {};
 var cacheQueue = [];
@@ -20520,6 +20871,7 @@ var hmac = (ctor, secret, data) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/getCanonicalHeaders.js
+init_buffer_global();
 var getCanonicalHeaders = ({ headers }, unsignableHeaders, signableHeaders) => {
   const canonical = {};
   for (const headerName of Object.keys(headers).sort()) {
@@ -20538,6 +20890,7 @@ var getCanonicalHeaders = ({ headers }, unsignableHeaders, signableHeaders) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/getPayloadHash.js
+init_buffer_global();
 init_dist_es();
 var getPayloadHash = async ({ headers, body }, hashConstructor) => {
   for (const headerName of Object.keys(headers)) {
@@ -20556,6 +20909,7 @@ var getPayloadHash = async ({ headers, body }, hashConstructor) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/HeaderFormatter.js
+init_buffer_global();
 init_dist_es();
 var HeaderFormatter = class {
   format(headers) {
@@ -20683,6 +21037,7 @@ function negate(bytes) {
 }
 
 // node_modules/@smithy/signature-v4/dist-es/headerUtil.js
+init_buffer_global();
 var hasHeader2 = (soughtHeader, headers) => {
   soughtHeader = soughtHeader.toLowerCase();
   for (const headerName of Object.keys(headers)) {
@@ -20694,6 +21049,7 @@ var hasHeader2 = (soughtHeader, headers) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/moveHeadersToQuery.js
+init_buffer_global();
 var moveHeadersToQuery = (request, options2 = {}) => {
   const { headers, query = {} } = HttpRequest.clone(request);
   for (const name of Object.keys(headers)) {
@@ -20711,6 +21067,7 @@ var moveHeadersToQuery = (request, options2 = {}) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/prepareRequest.js
+init_buffer_global();
 var prepareRequest = (request) => {
   request = HttpRequest.clone(request);
   for (const headerName of Object.keys(request.headers)) {
@@ -20722,9 +21079,11 @@ var prepareRequest = (request) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/SignatureV4Base.js
+init_buffer_global();
 init_dist_es();
 
 // node_modules/@smithy/signature-v4/dist-es/getCanonicalQuery.js
+init_buffer_global();
 var getCanonicalQuery = ({ query = {} }) => {
   const keys = [];
   const serialized = {};
@@ -20745,6 +21104,7 @@ var getCanonicalQuery = ({ query = {} }) => {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/utilDate.js
+init_buffer_global();
 var iso8601 = (time2) => toDate(time2).toISOString().replace(/\.\d{3}Z$/, "Z");
 var toDate = (time2) => {
   if (typeof time2 === "number") {
@@ -20951,11 +21311,13 @@ var SignatureV4 = class extends SignatureV4Base {
 };
 
 // node_modules/@smithy/signature-v4/dist-es/signature-v4a-container.js
+init_buffer_global();
 var signatureV4aContainer = {
   SignatureV4a: null
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/constants.js
+init_buffer_global();
 var S3_EXPRESS_BUCKET_TYPE = "Directory";
 var S3_EXPRESS_BACKEND = "S3Express";
 var S3_EXPRESS_AUTH_SCHEME = "sigv4-s3express";
@@ -21004,6 +21366,7 @@ function setSingleOverride(privateAccess, credentialsWithoutSessionToken) {
 }
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/functions/s3ExpressMiddleware.js
+init_buffer_global();
 var s3ExpressMiddleware = (options2) => {
   return (next, context) => async (args) => {
     if (context.endpointV2) {
@@ -21042,7 +21405,14 @@ var getS3ExpressPlugin = (options2) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/functions/s3ExpressHttpSigningMiddleware.js
+init_buffer_global();
+
+// node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/httpAuthSchemeMiddleware.js
+init_buffer_global();
+
 // node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/resolveAuthOptions.js
+init_buffer_global();
 var resolveAuthOptions = (candidateAuthOptions, authSchemePreference) => {
   if (!authSchemePreference || authSchemePreference.length === 0) {
     return candidateAuthOptions;
@@ -21107,6 +21477,7 @@ var httpAuthSchemeMiddleware = (config, mwOptions) => (next, context) => async (
 };
 
 // node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js
+init_buffer_global();
 var httpAuthSchemeEndpointRuleSetMiddlewareOptions = {
   step: "serialize",
   tags: ["HTTP_AUTH_SCHEME"],
@@ -21125,6 +21496,7 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = (config, { httpAuthSchemeParameters
 });
 
 // node_modules/@smithy/core/dist-es/middleware-http-signing/httpSigningMiddleware.js
+init_buffer_global();
 var defaultErrorHandler = (signingProperties) => (error) => {
   throw error;
 };
@@ -21149,6 +21521,7 @@ var httpSigningMiddleware = (config) => (next, context) => async (args) => {
 };
 
 // node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js
+init_buffer_global();
 var httpSigningMiddlewareOptions = {
   step: "finalizeRequest",
   tags: ["HTTP_SIGNING"],
@@ -21165,6 +21538,7 @@ var getHttpSigningPlugin = (config) => ({
 });
 
 // node_modules/@smithy/core/dist-es/normalizeProvider.js
+init_buffer_global();
 var normalizeProvider2 = (input) => {
   if (typeof input === "function")
     return input;
@@ -21173,6 +21547,7 @@ var normalizeProvider2 = (input) => {
 };
 
 // node_modules/@smithy/core/dist-es/setFeature.js
+init_buffer_global();
 function setFeature2(context, feature, value) {
   if (!context.__smithy_context) {
     context.__smithy_context = {
@@ -21185,6 +21560,7 @@ function setFeature2(context, feature, value) {
 }
 
 // node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
+init_buffer_global();
 var DefaultIdentityProviderConfig = class {
   authSchemes = /* @__PURE__ */ new Map();
   constructor(config) {
@@ -21200,6 +21576,7 @@ var DefaultIdentityProviderConfig = class {
 };
 
 // node_modules/@smithy/core/dist-es/util-identity-and-auth/memoizeIdentityProvider.js
+init_buffer_global();
 var createIsIdentityExpiredFunction = (expirationMs) => function isIdentityExpired2(identity) {
   return doesIdentityRequireRefresh(identity) && identity.expiration.getTime() - Date.now() < expirationMs;
 };
@@ -21256,6 +21633,7 @@ var memoizeIdentityProvider = (provider, isExpired, requiresRefresh) => {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/functions/signS3Express.js
+init_buffer_global();
 var signS3Express = async (s3ExpressIdentity, signingOptions, request, sigV4MultiRegionSigner) => {
   const signedRequest = await sigV4MultiRegionSigner.signWithCredentials(request, s3ExpressIdentity, {});
   if (signedRequest.headers["X-Amz-Security-Token"] || signedRequest.headers["x-amz-security-token"]) {
@@ -21300,6 +21678,7 @@ var getS3ExpressHttpSigningPlugin = (config) => ({
 });
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3Configuration.js
+init_buffer_global();
 var resolveS3Config = (input, { session }) => {
   const [s3ClientProvider, CreateSessionCommandCtor] = session;
   const { forcePathStyle, useAccelerateEndpoint, disableMultiregionAccessPoints, followRegionRedirects, s3ExpressIdentityProvider, bucketEndpoint, expectContinueHeader } = input;
@@ -21317,6 +21696,7 @@ var resolveS3Config = (input, { session }) => {
 };
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/throw-200-exceptions.js
+init_buffer_global();
 var THROW_IF_EMPTY_BODY = {
   CopyObjectCommand: true,
   UploadPartCopyCommand: true,
@@ -21381,10 +21761,15 @@ var getThrow200ExceptionsPlugin = (config) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/validate-bucket-name.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/util-arn-parser/dist-es/index.js
+init_buffer_global();
 var validate = (str) => typeof str === "string" && str.indexOf("arn:") === 0 && str.split(":").length >= 6;
 
 // node_modules/@aws-sdk/middleware-sdk-s3/dist-es/bucket-endpoint-middleware.js
+init_buffer_global();
 function bucketEndpointMiddleware(options2) {
   return (next, context) => async (args) => {
     if (options2.bucketEndpoint) {
@@ -21445,7 +21830,11 @@ var getValidateBucketNamePlugin = (options2) => ({
   }
 });
 
+// node_modules/@aws-sdk/middleware-sdk-s3/dist-es/protocol/S3RestXmlProtocol.js
+init_buffer_global();
+
 // node_modules/@smithy/util-body-length-browser/dist-es/calculateBodyLength.js
+init_buffer_global();
 var TEXT_ENCODER = typeof TextEncoder == "function" ? new TextEncoder() : null;
 var calculateBodyLength = (body) => {
   if (typeof body === "string") {
@@ -21472,6 +21861,7 @@ var calculateBodyLength = (body) => {
 };
 
 // node_modules/@aws-sdk/core/dist-es/submodules/protocols/ProtocolLib.js
+init_buffer_global();
 var ProtocolLib = class {
   queryCompat;
   errorRegistry;
@@ -21605,6 +21995,7 @@ var ProtocolLib = class {
 };
 
 // node_modules/@aws-sdk/core/dist-es/submodules/protocols/ConfigurableSerdeContext.js
+init_buffer_global();
 var SerdeContextConfig = class {
   serdeContext;
   setSerdeContext(serdeContext) {
@@ -21613,6 +22004,7 @@ var SerdeContextConfig = class {
 };
 
 // node_modules/@aws-sdk/core/dist-es/submodules/protocols/UnionSerde.js
+init_buffer_global();
 var UnionSerde = class {
   from;
   to;
@@ -21637,7 +22029,17 @@ var UnionSerde = class {
   }
 };
 
+// node_modules/@aws-sdk/core/dist-es/submodules/protocols/xml/XmlShapeDeserializer.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/xml-builder/dist-es/index.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/xml-builder/dist-es/XmlNode.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/xml-builder/dist-es/escape-attribute.js
+init_buffer_global();
 var ATTR_ESCAPE_RE = /[&<>"]/g;
 var ATTR_ESCAPE_MAP = {
   "&": "&amp;",
@@ -21649,7 +22051,11 @@ function escapeAttribute(value) {
   return value.replace(ATTR_ESCAPE_RE, (ch2) => ATTR_ESCAPE_MAP[ch2]);
 }
 
+// node_modules/@aws-sdk/xml-builder/dist-es/XmlText.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/xml-builder/dist-es/escape-element.js
+init_buffer_global();
 var ELEMENT_ESCAPE_RE = /[&"'<>\r\n\u0085\u2028]/g;
 var ELEMENT_ESCAPE_MAP = {
   "&": "&amp;",
@@ -21766,6 +22172,7 @@ var XmlNode = class _XmlNode {
 };
 
 // node_modules/@aws-sdk/xml-builder/dist-es/xml-parser.browser.js
+init_buffer_global();
 var parser;
 function parseXML(xmlString) {
   if (!parser) {
@@ -21963,7 +22370,11 @@ var XmlShapeDeserializer = class extends SerdeContextConfig {
   }
 };
 
+// node_modules/@aws-sdk/core/dist-es/submodules/protocols/xml/AwsRestXmlProtocol.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/core/dist-es/submodules/protocols/xml/parseXmlBody.js
+init_buffer_global();
 var loadRestXmlErrorCode = (output, data) => {
   if (data?.Error?.Code !== void 0) {
     return data.Error.Code;
@@ -21976,7 +22387,11 @@ var loadRestXmlErrorCode = (output, data) => {
   }
 };
 
+// node_modules/@aws-sdk/core/dist-es/submodules/protocols/xml/XmlCodec.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/core/dist-es/submodules/protocols/xml/XmlShapeSerializer.js
+init_buffer_global();
 var XmlShapeSerializer = class extends SerdeContextConfig {
   settings;
   stringBuffer;
@@ -22375,6 +22790,7 @@ var S3RestXmlProtocol = class extends AwsRestXmlProtocol {
 };
 
 // node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
+init_buffer_global();
 var DEFAULT_UA_APP_ID = void 0;
 function isValidUserAgentAppId(appId) {
   if (appId === void 0) {
@@ -22402,7 +22818,17 @@ function resolveUserAgentConfig(input) {
   });
 }
 
+// node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/index.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/aws.js
+init_buffer_global();
+
 // node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
+init_buffer_global();
 var EndpointCache = class {
   capacity;
   data = /* @__PURE__ */ new Map();
@@ -22455,10 +22881,12 @@ var EndpointCache = class {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/isIpAddress.js
+init_buffer_global();
 var IP_V4_REGEX = new RegExp(`^(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}$`);
 var isIpAddress = (value) => IP_V4_REGEX.test(value) || value.startsWith("[") && value.endsWith("]");
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/isValidHostLabel.js
+init_buffer_global();
 var VALID_HOST_LABEL_REGEX = new RegExp(`^(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}$`);
 var isValidHostLabel = (value, allowSubDomains = false) => {
   if (!allowSubDomains) {
@@ -22474,12 +22902,18 @@ var isValidHostLabel = (value, allowSubDomains = false) => {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
+init_buffer_global();
 var customEndpointFunctions = {};
 
+// node_modules/@smithy/util-endpoints/dist-es/resolveEndpoint.js
+init_buffer_global();
+
 // node_modules/@smithy/util-endpoints/dist-es/debug/debugId.js
+init_buffer_global();
 var debugId = "endpoints";
 
 // node_modules/@smithy/util-endpoints/dist-es/debug/toDebugString.js
+init_buffer_global();
 function toDebugString(input) {
   if (typeof input !== "object" || input == null) {
     return input;
@@ -22494,6 +22928,7 @@ function toDebugString(input) {
 }
 
 // node_modules/@smithy/util-endpoints/dist-es/types/EndpointError.js
+init_buffer_global();
 var EndpointError = class extends Error {
   constructor(message) {
     super(message);
@@ -22501,10 +22936,33 @@ var EndpointError = class extends Error {
   }
 };
 
+// node_modules/@smithy/util-endpoints/dist-es/utils/evaluateRules.js
+init_buffer_global();
+
+// node_modules/@smithy/util-endpoints/dist-es/utils/evaluateConditions.js
+init_buffer_global();
+
+// node_modules/@smithy/util-endpoints/dist-es/utils/evaluateCondition.js
+init_buffer_global();
+
+// node_modules/@smithy/util-endpoints/dist-es/utils/callFunction.js
+init_buffer_global();
+
+// node_modules/@smithy/util-endpoints/dist-es/utils/evaluateExpression.js
+init_buffer_global();
+
+// node_modules/@smithy/util-endpoints/dist-es/utils/endpointFunctions.js
+init_buffer_global();
+
 // node_modules/@smithy/util-endpoints/dist-es/lib/booleanEquals.js
+init_buffer_global();
 var booleanEquals = (value1, value2) => value1 === value2;
 
+// node_modules/@smithy/util-endpoints/dist-es/lib/getAttr.js
+init_buffer_global();
+
 // node_modules/@smithy/util-endpoints/dist-es/lib/getAttrPathList.js
+init_buffer_global();
 var getAttrPathList = (path) => {
   const parts = path.split(".");
   const pathList = [];
@@ -22540,12 +22998,15 @@ var getAttr = (value, path) => getAttrPathList(path).reduce((acc, index) => {
 }, value);
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/isSet.js
+init_buffer_global();
 var isSet = (value) => value != null;
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/not.js
+init_buffer_global();
 var not = (value) => !value;
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/parseURL.js
+init_buffer_global();
 var DEFAULT_PORTS = {
   [EndpointURLScheme.HTTP]: 80,
   [EndpointURLScheme.HTTPS]: 443
@@ -22593,9 +23054,11 @@ var parseURL = (value) => {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/stringEquals.js
+init_buffer_global();
 var stringEquals = (value1, value2) => value1 === value2;
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/substring.js
+init_buffer_global();
 var substring = (input, start, stop, reverse) => {
   if (start >= stop || input.length < stop || /[^\u0000-\u007f]/.test(input)) {
     return null;
@@ -22607,6 +23070,7 @@ var substring = (input, start, stop, reverse) => {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/lib/uriEncode.js
+init_buffer_global();
 var uriEncode = (value) => encodeURIComponent(value).replace(/[!*'()]/g, (c2) => `%${c2.charCodeAt(0).toString(16).toUpperCase()}`);
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/endpointFunctions.js
@@ -22623,6 +23087,7 @@ var endpointFunctions = {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/evaluateTemplate.js
+init_buffer_global();
 var evaluateTemplate = (template, options2) => {
   const evaluatedTemplateArr = [];
   const templateContext = {
@@ -22659,6 +23124,7 @@ var evaluateTemplate = (template, options2) => {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/getReferenceValue.js
+init_buffer_global();
 var getReferenceValue = ({ ref }, options2) => {
   const referenceRecord = {
     ...options2.endpointParams,
@@ -22726,7 +23192,11 @@ var evaluateConditions = (conditions = [], options2) => {
   return { result: true, referenceRecord: conditionsReferenceRecord };
 };
 
+// node_modules/@smithy/util-endpoints/dist-es/utils/evaluateEndpointRule.js
+init_buffer_global();
+
 // node_modules/@smithy/util-endpoints/dist-es/utils/getEndpointHeaders.js
+init_buffer_global();
 var getEndpointHeaders = (headers, options2) => Object.entries(headers).reduce((acc, [headerKey, headerVal]) => ({
   ...acc,
   [headerKey]: headerVal.map((headerValEntry) => {
@@ -22739,6 +23209,7 @@ var getEndpointHeaders = (headers, options2) => Object.entries(headers).reduce((
 }), {});
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/getEndpointProperties.js
+init_buffer_global();
 var getEndpointProperties = (properties, options2) => Object.entries(properties).reduce((acc, [propertyKey, propertyVal]) => ({
   ...acc,
   [propertyKey]: group2.getEndpointProperty(propertyVal, options2)
@@ -22767,6 +23238,7 @@ var group2 = {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/getEndpointUrl.js
+init_buffer_global();
 var getEndpointUrl = (endpointUrl, options2) => {
   const expression = evaluateExpression(endpointUrl, "Endpoint URL", options2);
   if (typeof expression === "string") {
@@ -22805,6 +23277,7 @@ var evaluateEndpointRule = (endpointRule, options2) => {
 };
 
 // node_modules/@smithy/util-endpoints/dist-es/utils/evaluateErrorRule.js
+init_buffer_global();
 var evaluateErrorRule = (errorRule, options2) => {
   const { conditions, error } = errorRule;
   const { result, referenceRecord } = evaluateConditions(conditions, options2);
@@ -22877,6 +23350,12 @@ var resolveEndpoint = (ruleSetObject, options2) => {
 };
 
 // node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/isVirtualHostableS3Bucket.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/lib/isIpAddress.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/isVirtualHostableS3Bucket.js
 var isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
   if (allowSubDomains) {
     for (const label of value.split(".")) {
@@ -22902,6 +23381,7 @@ var isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
 };
 
 // node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/parseArn.js
+init_buffer_global();
 var ARN_DELIMITER = ":";
 var RESOURCE_DELIMITER = "/";
 var parseArn = (value) => {
@@ -22920,6 +23400,9 @@ var parseArn = (value) => {
     resourceId
   };
 };
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partition.js
+init_buffer_global();
 
 // node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partitions.json
 var partitions_default = {
@@ -23232,7 +23715,41 @@ var awsEndpointFunctions = {
 };
 customEndpointFunctions.aws = awsEndpointFunctions;
 
+// node_modules/@aws-sdk/util-endpoints/dist-es/resolveDefaultAwsRegionalEndpointsConfig.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/resolveEndpoint.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/index.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/EndpointError.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/EndpointRuleObject.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/ErrorRuleObject.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/RuleSetObject.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/TreeRuleObject.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/util-endpoints/dist-es/types/shared.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/middleware-user-agent/dist-es/check-features.js
+init_buffer_global();
+
+// node_modules/@smithy/util-retry/dist-es/AdaptiveRetryStrategy.js
+init_buffer_global();
+
 // node_modules/@smithy/util-retry/dist-es/config.js
+init_buffer_global();
 var RETRY_MODES;
 (function(RETRY_MODES2) {
   RETRY_MODES2["STANDARD"] = "standard";
@@ -23241,7 +23758,14 @@ var RETRY_MODES;
 var DEFAULT_MAX_ATTEMPTS = 3;
 var DEFAULT_RETRY_MODE = RETRY_MODES.STANDARD;
 
+// node_modules/@smithy/util-retry/dist-es/DefaultRateLimiter.js
+init_buffer_global();
+
+// node_modules/@smithy/service-error-classification/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@smithy/service-error-classification/dist-es/constants.js
+init_buffer_global();
 var THROTTLING_ERROR_CODES = [
   "BandwidthLimitExceeded",
   "EC2ThrottledException",
@@ -23403,14 +23927,22 @@ var DefaultRateLimiter = class _DefaultRateLimiter {
   }
 };
 
+// node_modules/@smithy/util-retry/dist-es/StandardRetryStrategy.js
+init_buffer_global();
+
 // node_modules/@smithy/util-retry/dist-es/constants.js
+init_buffer_global();
 var MAXIMUM_RETRY_DELAY = 20 * 1e3;
 var INITIAL_RETRY_TOKENS = 500;
 var NO_RETRY_INCREMENT = 1;
 var INVOCATION_ID_HEADER = "amz-sdk-invocation-id";
 var REQUEST_HEADER = "amz-sdk-request";
 
+// node_modules/@smithy/util-retry/dist-es/DefaultRetryBackoffStrategy.js
+init_buffer_global();
+
 // node_modules/@smithy/util-retry/dist-es/retries-2026-config.js
+init_buffer_global();
 var Retry = class _Retry {
   static v2026 = typeof process !== "undefined" && process.env?.SMITHY_NEW_RETRIES_2026 === "true";
   static delay() {
@@ -23445,6 +23977,7 @@ var DefaultRetryBackoffStrategy = class {
 };
 
 // node_modules/@smithy/util-retry/dist-es/DefaultRetryToken.js
+init_buffer_global();
 var DefaultRetryToken = class {
   delay;
   count;
@@ -23624,6 +24157,7 @@ async function checkFeatures(context, config, args) {
 }
 
 // node_modules/@aws-sdk/middleware-user-agent/dist-es/constants.js
+init_buffer_global();
 var USER_AGENT = "user-agent";
 var X_AMZ_USER_AGENT = "x-amz-user-agent";
 var SPACE = " ";
@@ -23633,6 +24167,7 @@ var UA_VALUE_ESCAPE_REGEX = /[^!$%&'*+\-.^_`|~\w#]/g;
 var UA_ESCAPE_CHAR = "-";
 
 // node_modules/@aws-sdk/middleware-user-agent/dist-es/encode-features.js
+init_buffer_global();
 var BYTE_LIMIT = 1024;
 function encodeFeatures(features) {
   let buffer = "";
@@ -23721,12 +24256,18 @@ var getUserAgentPlugin = (config) => ({
 });
 
 // node_modules/@smithy/config-resolver/dist-es/endpointsConfig/NodeUseDualstackEndpointConfigOptions.js
+init_buffer_global();
 var DEFAULT_USE_DUALSTACK_ENDPOINT = false;
 
 // node_modules/@smithy/config-resolver/dist-es/endpointsConfig/NodeUseFipsEndpointConfigOptions.js
+init_buffer_global();
 var DEFAULT_USE_FIPS_ENDPOINT = false;
 
+// node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js
+init_buffer_global();
+
 // node_modules/@smithy/config-resolver/dist-es/regionConfig/checkRegion.js
+init_buffer_global();
 var validRegions = /* @__PURE__ */ new Set();
 var checkRegion = (region, check = isValidHostLabel) => {
   if (!validRegions.has(region) && !check(region)) {
@@ -23740,7 +24281,11 @@ var checkRegion = (region, check = isValidHostLabel) => {
   }
 };
 
+// node_modules/@smithy/config-resolver/dist-es/regionConfig/getRealRegion.js
+init_buffer_global();
+
 // node_modules/@smithy/config-resolver/dist-es/regionConfig/isFipsRegion.js
+init_buffer_global();
 var isFipsRegion = (region) => typeof region === "string" && (region.startsWith("fips-") || region.endsWith("-fips"));
 
 // node_modules/@smithy/config-resolver/dist-es/regionConfig/getRealRegion.js
@@ -23770,11 +24315,13 @@ var resolveRegionConfig = (input) => {
 };
 
 // node_modules/@smithy/eventstream-serde-config-resolver/dist-es/EventStreamSerdeConfig.js
+init_buffer_global();
 var resolveEventStreamSerdeConfig = (input) => Object.assign(input, {
   eventStreamMarshaller: input.eventStreamSerdeProvider(input)
 });
 
 // node_modules/@smithy/middleware-content-length/dist-es/index.js
+init_buffer_global();
 var CONTENT_LENGTH_HEADER = "content-length";
 function contentLengthMiddleware(bodyLengthChecker) {
   return (next) => async (args) => {
@@ -23810,7 +24357,11 @@ var getContentLengthPlugin = (options2) => ({
   }
 });
 
+// node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromInstructions.js
+init_buffer_global();
+
 // node_modules/@smithy/middleware-endpoint/dist-es/service-customizations/s3.js
+init_buffer_global();
 var resolveParamsForS3 = async (endpointParams) => {
   const bucket = endpointParams?.Bucket || "";
   if (typeof endpointParams.Bucket === "string") {
@@ -23844,6 +24395,7 @@ var isArnBucketName = (bucketName) => {
 };
 
 // node_modules/@smithy/middleware-endpoint/dist-es/adaptors/createConfigValueProvider.js
+init_buffer_global();
 var createConfigValueProvider = (configKey, canonicalEndpointParamKey, config, isClientContextParam = false) => {
   const configProvider = async () => {
     let configValue;
@@ -23895,9 +24447,11 @@ var createConfigValueProvider = (configKey, canonicalEndpointParamKey, config, i
 };
 
 // node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromConfig.browser.js
+init_buffer_global();
 var getEndpointFromConfig = async (serviceId) => void 0;
 
 // node_modules/@smithy/middleware-endpoint/dist-es/adaptors/toEndpointV1.js
+init_buffer_global();
 var toEndpointV12 = (endpoint) => {
   if (typeof endpoint === "object") {
     if ("url" in endpoint) {
@@ -23977,6 +24531,7 @@ var resolveParams = async (commandInput, instructionsSupplier, clientConfig) => 
 };
 
 // node_modules/@smithy/middleware-endpoint/dist-es/endpointMiddleware.js
+init_buffer_global();
 var endpointMiddleware = ({ config, instructions }) => {
   return (next, context) => async (args) => {
     if (config.isCustomEndpoint) {
@@ -24011,7 +24566,11 @@ var endpointMiddleware = ({ config, instructions }) => {
   };
 };
 
+// node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js
+init_buffer_global();
+
 // node_modules/@smithy/middleware-serde/dist-es/serdePlugin.js
+init_buffer_global();
 var serializerMiddlewareOption2 = {
   name: "serializerMiddleware",
   step: "serialize",
@@ -24038,6 +24597,7 @@ var getEndpointPlugin = (config, instructions) => ({
 });
 
 // node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
+init_buffer_global();
 var resolveEndpointConfig = (input) => {
   const tls = input.tls ?? true;
   const { endpoint, useDualstackEndpoint, useFipsEndpoint } = input;
@@ -24061,6 +24621,7 @@ var resolveEndpointConfig = (input) => {
 };
 
 // node_modules/@smithy/middleware-retry/dist-es/util.js
+init_buffer_global();
 var asSdkError = (error) => {
   if (error instanceof Error)
     return error;
@@ -24072,6 +24633,7 @@ var asSdkError = (error) => {
 };
 
 // node_modules/@smithy/middleware-retry/dist-es/configurations.js
+init_buffer_global();
 var resolveRetryConfig = (input) => {
   const { retryStrategy, retryMode } = input;
   const maxAttempts = normalizeProvider(input.maxAttempts ?? DEFAULT_MAX_ATTEMPTS);
@@ -24083,10 +24645,15 @@ var resolveRetryConfig = (input) => {
   });
 };
 
+// node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js
+init_buffer_global();
+
 // node_modules/@smithy/middleware-retry/dist-es/isStreamingPayload/isStreamingPayload.browser.js
+init_buffer_global();
 var isStreamingPayload = (request) => request?.body instanceof ReadableStream;
 
 // node_modules/@smithy/middleware-retry/dist-es/parseRetryAfterHeader.js
+init_buffer_global();
 function parseRetryAfterHeader(response, logger2) {
   if (!HttpResponse.isInstance(response)) {
     return;
@@ -24221,13 +24788,28 @@ var getRetryPlugin = (options2) => ({
   }
 });
 
+// node_modules/@aws-sdk/client-s3/dist-es/auth/httpAuthSchemeProvider.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/index.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/utils/getDateHeader.js
+init_buffer_global();
 var getDateHeader = (response) => HttpResponse.isInstance(response) ? response.headers?.date ?? response.headers?.Date : void 0;
 
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/utils/getSkewCorrectedDate.js
+init_buffer_global();
 var getSkewCorrectedDate = (systemClockOffset) => new Date(Date.now() + systemClockOffset);
 
+// node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/utils/getUpdatedSystemClockOffset.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/utils/isClockSkewed.js
+init_buffer_global();
 var isClockSkewed = (clockTime, systemClockOffset) => Math.abs(getSkewCorrectedDate(systemClockOffset).getTime() - clockTime) >= 3e5;
 
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/utils/getUpdatedSystemClockOffset.js
@@ -24311,6 +24893,7 @@ var AwsSdkSigV4Signer = class {
 };
 
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4ASigner.js
+init_buffer_global();
 var AwsSdkSigV4ASigner = class extends AwsSdkSigV4Signer {
   async sign(httpRequest, identity, signingProperties) {
     if (!HttpRequest.isInstance(httpRequest)) {
@@ -24328,7 +24911,11 @@ var AwsSdkSigV4ASigner = class extends AwsSdkSigV4Signer {
   }
 };
 
+// node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4AConfig.js
+init_buffer_global();
+
 // node_modules/@smithy/property-provider/dist-es/memoize.js
+init_buffer_global();
 var memoize = (provider, isExpired, requiresRefresh) => {
   let resolved;
   let pending;
@@ -24381,6 +24968,7 @@ var resolveAwsSdkSigV4AConfig = (config) => {
 };
 
 // node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js
+init_buffer_global();
 var resolveAwsSdkSigV4Config = (config) => {
   let inputCredentials = config.credentials;
   let isUserSupplied = !!config.credentials;
@@ -24509,7 +25097,11 @@ function bindCallerConfig(config, credentialsProvider) {
   return fn;
 }
 
+// node_modules/@aws-sdk/signature-v4-multi-region/dist-es/SignatureV4MultiRegion.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/signature-v4-multi-region/dist-es/signature-v4-crt-container.js
+init_buffer_global();
 var signatureV4CrtContainer = {
   CrtSignerV4: null
 };
@@ -24600,7 +25192,11 @@ var SignatureV4MultiRegion = class {
   }
 };
 
+// node_modules/@aws-sdk/client-s3/dist-es/endpoint/endpointResolver.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/client-s3/dist-es/endpoint/ruleset.js
+init_buffer_global();
 var cs = "required";
 var ct = "type";
 var cu = "rules";
@@ -24939,7 +25535,11 @@ var resolveHttpAuthSchemeConfig = (config) => {
   });
 };
 
+// node_modules/@aws-sdk/client-s3/dist-es/commands/CreateSessionCommand.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/client-s3/dist-es/endpoint/EndpointParameters.js
+init_buffer_global();
 var resolveClientEndpointParameters = (options2) => {
   return Object.assign(options2, {
     useFipsEndpoint: options2.useFipsEndpoint ?? false,
@@ -24965,7 +25565,14 @@ var commonParams = {
   UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" }
 };
 
+// node_modules/@aws-sdk/client-s3/dist-es/schemas/schemas_0.js
+init_buffer_global();
+
+// node_modules/@aws-sdk/client-s3/dist-es/models/errors.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/client-s3/dist-es/models/S3ServiceException.js
+init_buffer_global();
 var S3ServiceException = class _S3ServiceException extends ServiceException {
   constructor(options2) {
     super(options2);
@@ -30352,6 +30959,9 @@ var CreateSessionCommand = class extends Command.classBuilder().ep({
 }).s("AmazonS3", "CreateSession", {}).n("S3Client", "CreateSessionCommand").sc(CreateSession$).build() {
 };
 
+// node_modules/@aws-sdk/client-s3/dist-es/runtimeConfig.browser.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/client-s3/package.json
 var package_default = {
   name: "@aws-sdk/client-s3",
@@ -30481,10 +31091,30 @@ var package_default = {
   }
 };
 
+// node_modules/@aws-crypto/sha1-browser/build/module/index.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha1-browser/build/module/crossPlatformSha1.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha1-browser/build/module/webCryptoSha1.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha1-browser/node_modules/@smithy/util-utf8/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/sha1-browser/node_modules/@smithy/util-utf8/dist-es/fromUtf8.browser.js
+init_buffer_global();
 var fromUtf84 = (input) => new TextEncoder().encode(input);
 
+// node_modules/@aws-crypto/sha1-browser/node_modules/@smithy/util-utf8/dist-es/toUint8Array.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha1-browser/node_modules/@smithy/util-utf8/dist-es/toUtf8.browser.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/sha1-browser/build/module/isEmptyData.js
+init_buffer_global();
 function isEmptyData2(data) {
   if (typeof data === "string") {
     return data.length === 0;
@@ -30493,6 +31123,7 @@ function isEmptyData2(data) {
 }
 
 // node_modules/@aws-crypto/sha1-browser/build/module/constants.js
+init_buffer_global();
 var SHA_1_HASH = { name: "SHA-1" };
 var SHA_1_HMAC_ALGO = {
   name: "HMAC",
@@ -30522,6 +31153,7 @@ var EMPTY_DATA_SHA_1 = new Uint8Array([
 ]);
 
 // node_modules/@aws-sdk/util-locate-window/dist-es/index.js
+init_buffer_global();
 var fallbackWindow = {};
 function locateWindow() {
   if (typeof window !== "undefined") {
@@ -30590,7 +31222,11 @@ function convertToBuffer2(data) {
   return new Uint8Array(data);
 }
 
+// node_modules/@aws-crypto/supports-web-crypto/build/module/index.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/supports-web-crypto/build/module/supportsWebCrypto.js
+init_buffer_global();
 var subtleCryptoMethods = [
   "decrypt",
   "digest",
@@ -30645,7 +31281,17 @@ var Sha12 = (
   })()
 );
 
+// node_modules/@aws-crypto/sha256-browser/build/module/index.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha256-browser/build/module/crossPlatformSha256.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha256-browser/build/module/webCryptoSha256.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/sha256-browser/build/module/constants.js
+init_buffer_global();
 var SHA_256_HASH = { name: "SHA-256" };
 var SHA_256_HMAC_ALGO = {
   name: "HMAC",
@@ -30738,7 +31384,14 @@ var Sha256 = (
   })()
 );
 
+// node_modules/@aws-crypto/sha256-js/build/module/index.js
+init_buffer_global();
+
+// node_modules/@aws-crypto/sha256-js/build/module/jsSha256.js
+init_buffer_global();
+
 // node_modules/@aws-crypto/sha256-js/build/module/constants.js
+init_buffer_global();
 var BLOCK_SIZE = 64;
 var DIGEST_LENGTH = 32;
 var KEY = new Uint32Array([
@@ -30820,6 +31473,7 @@ var INIT = [
 var MAX_HASHABLE_LENGTH = Math.pow(2, 53) - 1;
 
 // node_modules/@aws-crypto/sha256-js/build/module/RawSha256.js
+init_buffer_global();
 var RawSha256 = (
   /** @class */
   (function() {
@@ -31013,6 +31667,7 @@ var Sha2563 = (
 );
 
 // node_modules/@aws-sdk/util-user-agent-browser/dist-es/index.js
+init_buffer_global();
 var createDefaultUserAgentProvider = ({ serviceId, clientVersion }) => async (config) => {
   const navigator = typeof window !== "undefined" ? window.navigator : void 0;
   const uaString = navigator?.userAgent ?? "";
@@ -31065,7 +31720,20 @@ var fallback = {
   }
 };
 
+// node_modules/@smithy/eventstream-serde-browser/dist-es/EventStreamMarshaller.js
+init_buffer_global();
+
+// node_modules/@smithy/eventstream-serde-universal/dist-es/EventStreamMarshaller.js
+init_buffer_global();
+
+// node_modules/@smithy/eventstream-codec/dist-es/EventStreamCodec.js
+init_buffer_global();
+
+// node_modules/@smithy/eventstream-codec/dist-es/HeaderMarshaller.js
+init_buffer_global();
+
 // node_modules/@smithy/eventstream-codec/dist-es/Int64.js
+init_buffer_global();
 var Int642 = class _Int64 {
   bytes;
   constructor(bytes) {
@@ -31295,6 +31963,7 @@ var UUID_TAG = "uuid";
 var UUID_PATTERN2 = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 
 // node_modules/@smithy/eventstream-codec/dist-es/splitMessage.js
+init_buffer_global();
 var PRELUDE_MEMBER_LENGTH = 4;
 var PRELUDE_LENGTH = PRELUDE_MEMBER_LENGTH * 2;
 var CHECKSUM_LENGTH = 4;
@@ -31390,6 +32059,7 @@ var EventStreamCodec = class {
 };
 
 // node_modules/@smithy/eventstream-codec/dist-es/MessageDecoderStream.js
+init_buffer_global();
 var MessageDecoderStream = class {
   options;
   constructor(options2) {
@@ -31407,6 +32077,7 @@ var MessageDecoderStream = class {
 };
 
 // node_modules/@smithy/eventstream-codec/dist-es/MessageEncoderStream.js
+init_buffer_global();
 var MessageEncoderStream = class {
   options;
   constructor(options2) {
@@ -31427,6 +32098,7 @@ var MessageEncoderStream = class {
 };
 
 // node_modules/@smithy/eventstream-codec/dist-es/SmithyMessageDecoderStream.js
+init_buffer_global();
 var SmithyMessageDecoderStream = class {
   options;
   constructor(options2) {
@@ -31446,6 +32118,7 @@ var SmithyMessageDecoderStream = class {
 };
 
 // node_modules/@smithy/eventstream-codec/dist-es/SmithyMessageEncoderStream.js
+init_buffer_global();
 var SmithyMessageEncoderStream = class {
   options;
   constructor(options2) {
@@ -31463,6 +32136,7 @@ var SmithyMessageEncoderStream = class {
 };
 
 // node_modules/@smithy/eventstream-serde-universal/dist-es/getChunkedStream.js
+init_buffer_global();
 function getChunkedStream(source) {
   let currentMessageTotalLength = 0;
   let currentMessagePendingLength = 0;
@@ -31529,6 +32203,7 @@ function getChunkedStream(source) {
 }
 
 // node_modules/@smithy/eventstream-serde-universal/dist-es/getUnmarshalledStream.js
+init_buffer_global();
 function getMessageUnmarshaller(deserializer, toUtf82) {
   return async function(message) {
     const { value: messageType } = message.headers[":message-type"];
@@ -31585,6 +32260,7 @@ var EventStreamMarshaller = class {
 };
 
 // node_modules/@smithy/eventstream-serde-browser/dist-es/utils.js
+init_buffer_global();
 var readableStreamtoIterable = (readableStream) => ({
   [Symbol.asyncIterator]: async function* () {
     const reader = readableStream.getReader();
@@ -31634,9 +32310,14 @@ var EventStreamMarshaller2 = class {
 var isReadableStream2 = (body) => typeof ReadableStream === "function" && body instanceof ReadableStream;
 
 // node_modules/@smithy/eventstream-serde-browser/dist-es/provider.js
+init_buffer_global();
 var eventStreamSerdeProvider = (options2) => new EventStreamMarshaller2(options2);
 
+// node_modules/@smithy/hash-blob-browser/dist-es/index.js
+init_buffer_global();
+
 // node_modules/@smithy/chunked-blob-reader/dist-es/index.js
+init_buffer_global();
 async function blobReader(blob, onChunk, chunkSize = 1024 * 1024) {
   const size = blob.size;
   let totalBytesRead = 0;
@@ -31657,12 +32338,15 @@ var blobHasher = async function blobHasher2(hashCtor, blob) {
 };
 
 // node_modules/@smithy/invalid-dependency/dist-es/invalidProvider.js
+init_buffer_global();
 var invalidProvider = (message) => () => Promise.reject(message);
 
 // node_modules/@smithy/md5-js/dist-es/index.js
+init_buffer_global();
 init_dist_es();
 
 // node_modules/@smithy/md5-js/dist-es/constants.js
+init_buffer_global();
 var BLOCK_SIZE2 = 64;
 var DIGEST_LENGTH2 = 16;
 var INIT2 = [1732584193, 4023233417, 2562383102, 271733878];
@@ -31834,7 +32518,11 @@ function convertToBuffer3(data) {
   return new Uint8Array(data);
 }
 
+// node_modules/@smithy/util-defaults-mode-browser/dist-es/resolveDefaultsModeConfig.js
+init_buffer_global();
+
 // node_modules/@smithy/util-defaults-mode-browser/dist-es/constants.js
+init_buffer_global();
 var DEFAULTS_MODE_OPTIONS = ["in-region", "cross-region", "mobile", "standard", "legacy"];
 
 // node_modules/@smithy/util-defaults-mode-browser/dist-es/resolveDefaultsModeConfig.js
@@ -31868,6 +32556,7 @@ var useMobileConfiguration = () => {
 };
 
 // node_modules/@aws-sdk/client-s3/dist-es/runtimeConfig.shared.js
+init_buffer_global();
 init_dist_es();
 var getRuntimeConfig = (config) => {
   return {
@@ -31939,7 +32628,11 @@ var getRuntimeConfig2 = (config) => {
   };
 };
 
+// node_modules/@aws-sdk/client-s3/dist-es/runtimeExtensions.js
+init_buffer_global();
+
 // node_modules/@aws-sdk/region-config-resolver/dist-es/extensions/index.js
+init_buffer_global();
 var getAwsRegionExtensionConfiguration = (runtimeConfig) => {
   return {
     setRegion(region) {
@@ -31957,6 +32650,7 @@ var resolveAwsRegionExtensionConfiguration = (awsRegionExtensionConfiguration) =
 };
 
 // node_modules/@aws-sdk/client-s3/dist-es/auth/httpAuthExtensionConfiguration.js
+init_buffer_global();
 var getHttpAuthExtensionConfiguration = (runtimeConfig) => {
   const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
   let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
@@ -32048,6 +32742,7 @@ var S3Client = class extends Client {
 };
 
 // node_modules/@aws-sdk/middleware-ssec/dist-es/index.js
+init_buffer_global();
 function ssecMiddleware(options2) {
   return (next) => async (args) => {
     const input = { ...args.input };
@@ -32111,6 +32806,7 @@ function isValidBase64EncodedSSECustomerKey(str, options2) {
 }
 
 // node_modules/@aws-sdk/client-s3/dist-es/commands/GetObjectCommand.js
+init_buffer_global();
 var GetObjectCommand = class extends Command.classBuilder().ep({
   ...commonParams,
   Bucket: { type: "contextParams", name: "Bucket" },
@@ -32130,6 +32826,7 @@ var GetObjectCommand = class extends Command.classBuilder().ep({
 };
 
 // node_modules/@aws-sdk/client-s3/dist-es/commands/HeadObjectCommand.js
+init_buffer_global();
 var HeadObjectCommand = class extends Command.classBuilder().ep({
   ...commonParams,
   Bucket: { type: "contextParams", name: "Bucket" },
