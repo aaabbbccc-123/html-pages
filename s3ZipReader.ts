@@ -1,9 +1,9 @@
 // npm install yauzl @aws-sdk/client-s3
 // npm install --save-dev @types/yauzl
 
+import './polyfill';
 import yauzl from 'yauzl';
 import { S3Client, HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { Buffer } from 'buffer';
 import { PassThrough, Readable } from 'stream';
 
 const NON_SEQUENTIAL_FETCH_CAP = 256 * 1024;
