@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-${BUN:-bun} build s3ZipReader.ts --target browser --format iife --outfile s3ZipReader.js --minify
+${BUN:-bun} build s3ZipReader.ts --target browser --format iife --outfile s3ZipReader.js --minify-whitespace --minify-syntax
 
 # Expose S3ZipReader as a global (IIFE doesn't export by default)
 python3 -c "
