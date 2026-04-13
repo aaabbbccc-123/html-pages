@@ -458,10 +458,6 @@
     ::-webkit-scrollbar-thumb { background: #45475a; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #585b70; }
   </style>
-  <script src="https://cdn.jsdelivr.net/gh/pjdeveloper896/TSNova@latest/dist/ts-runtime.min.js"></script>
-  <script>
-    runTSFromURL("s3ZipReader.ts");
-  </script>
 </head>
 <body>
 
@@ -555,6 +551,8 @@
 </script>
 
 <script type="module">
+  import { S3ZipReader } from './s3ZipReader.js';
+
   const CDN = 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@latest/dist/';
 
   const BUNDLES = {
