@@ -143,9 +143,12 @@ class HttpRandomAccessReader extends CachedRandomAccessReader {
     return fetch(this.url, {
       headers: { Range: `bytes=${start}-${end - 1}` },
     })
-      .then(res => {
+      .then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching range ${start}-${end - 1}`);
-        return Readable.fromWeb(res.body as ReadableStream);
+        const buf = Buffer.from(await res.arrayBuffer());
+        const pass = new PassThrough();
+        pass.end(buf);
+        return pass;
       });
   }
 }
