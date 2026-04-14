@@ -501,7 +501,7 @@
       </div>
       <div class="file-tab-content" id="url-tab">
         <div id="url-tab-row">
-          <input type="text" id="url-input" placeholder="https://…/archive.zip">
+          <input type="text" id="url-input" placeholder="https://…/archive.zip#file.parquet">
           <button id="url-load-btn">Load</button>
         </div>
       </div>
@@ -808,16 +808,23 @@
   urlLoadBtn.addEventListener('click', () => loadFromUrl(urlInput.value.trim()));
   urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadFromUrl(urlInput.value.trim()); });
 
-  async function loadFromUrl(url) {
-    if (!url || !db) return;
+  async function loadFromUrl(raw) {
+    if (!raw || !db) return;
+    const hashIdx = raw.indexOf('#');
+    if (hashIdx === -1 || !raw.slice(hashIdx + 1).trim()) {
+      setStatus('URL load failed: missing #filename after zip URL', 'error');
+      return;
+    }
+    const zipUrl  = raw.slice(0, hashIdx);
+    const fileName = raw.slice(hashIdx + 1);
     urlLoadBtn.disabled = true;
     setStatus('Fetching ZIP…', 'busy');
     try {
-      const zipReader = await S3ZipReader.fromWebUrl(url);
-      const buffer = await zipReader.readFile('result.parquet');
+      const zipReader = await S3ZipReader.fromWebUrl(zipUrl);
+      const buffer = await zipReader.readFile(fileName);
       zipReader.close();
-      await db.registerFileBuffer('result.parquet', new Uint8Array(buffer));
-      registeredFiles.set('result.parquet', true);
+      await db.registerFileBuffer(fileName, new Uint8Array(buffer));
+      registeredFiles.set(fileName, true);
       renderFileList();
       setStatus('Ready', 'ready');
     } catch (err) {
