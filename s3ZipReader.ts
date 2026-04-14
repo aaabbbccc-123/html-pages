@@ -8,6 +8,24 @@ import { PassThrough, Readable } from 'stream';
 
 const NON_SEQUENTIAL_FETCH_CAP = 256 * 1024;
 
+// Readable.fromWeb is not implemented in bun's browser stream polyfill
+function readableFromWebStream(webStream: ReadableStream<Uint8Array>): PassThrough {
+  const pass = new PassThrough();
+  const reader = webStream.getReader();
+  (async () => {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) { pass.end(); break; }
+        pass.write(value);
+      }
+    } catch (err) {
+      pass.destroy(err as Error);
+    }
+  })();
+  return pass;
+}
+
 function chooseReadRangeEnd(
   position: number,
   requestLength: number,
@@ -143,12 +161,9 @@ class HttpRandomAccessReader extends CachedRandomAccessReader {
     return fetch(this.url, {
       headers: { Range: `bytes=${start}-${end - 1}` },
     })
-      .then(async res => {
+      .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching range ${start}-${end - 1}`);
-        const buf = Buffer.from(await res.arrayBuffer());
-        const pass = new PassThrough();
-        pass.end(buf);
-        return pass;
+        return readableFromWebStream(res.body as ReadableStream<Uint8Array>);
       });
   }
 }

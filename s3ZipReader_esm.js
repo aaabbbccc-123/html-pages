@@ -29749,6 +29749,25 @@ class HeadObjectCommand extends Command.classBuilder().ep({
 // s3ZipReader.ts
 var import_stream = __toESM(require_stream(), 1);
 var NON_SEQUENTIAL_FETCH_CAP = 256 * 1024;
+function readableFromWebStream(webStream) {
+  const pass = new import_stream.PassThrough;
+  const reader = webStream.getReader();
+  (async () => {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          pass.end();
+          break;
+        }
+        pass.write(value);
+      }
+    } catch (err) {
+      pass.destroy(err);
+    }
+  })();
+  return pass;
+}
 function chooseReadRangeEnd(position, requestLength, totalSize) {
   return Math.min(totalSize, position + Math.max(requestLength, NON_SEQUENTIAL_FETCH_CAP));
 }
@@ -29833,13 +29852,10 @@ class HttpRandomAccessReader extends CachedRandomAccessReader {
     console.log(`fetching range ${start}-${end - 1}`);
     return fetch(this.url, {
       headers: { Range: `bytes=${start}-${end - 1}` }
-    }).then(async (res) => {
+    }).then((res) => {
       if (!res.ok)
         throw new Error(`HTTP ${res.status} fetching range ${start}-${end - 1}`);
-      const buf = Buffer.from(await res.arrayBuffer());
-      const pass = new import_stream.PassThrough;
-      pass.end(buf);
-      return pass;
+      return readableFromWebStream(res.body);
     });
   }
 }
