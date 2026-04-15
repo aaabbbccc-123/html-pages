@@ -13293,6 +13293,9 @@ var umask = function() {
 // polyfill.ts
 window.Buffer = Buffer2;
 window.process = exports_process;
+window.process.nextTick = function nextTick2(fun, ...args) {
+  queueMicrotask(() => fun(...args));
+};
 
 // s3ZipReader.ts
 var import_yauzl = __toESM(require_yauzl(), 1);
