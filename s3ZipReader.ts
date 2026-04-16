@@ -74,7 +74,7 @@ abstract class CachedRandomAccessReader extends yauzl.RandomAccessReader {
     callback: (err: Error | null) => void,
   ): void {
     if (length === 0) {
-      setImmediate(() => callback(null));
+      queueMicrotask(() => callback(null));
       return;
     }
     const readEnd = position + length;
@@ -84,7 +84,7 @@ abstract class CachedRandomAccessReader extends yauzl.RandomAccessReader {
       readEnd <= this.cacheStart + this.cache.length
     ) {
       this.cache.copy(buffer, offset, position - this.cacheStart, readEnd - this.cacheStart);
-      setImmediate(() => callback(null));
+      queueMicrotask(() => callback(null));
       return;
     }
     const rangeEnd = chooseReadRangeEnd(
@@ -114,7 +114,7 @@ abstract class CachedRandomAccessReader extends yauzl.RandomAccessReader {
       end <= this.cacheStart + this.cache.length
     ) {
       const slice = this.cache.subarray(start - this.cacheStart, end - this.cacheStart);
-      setImmediate(() => pass.end(slice));
+      queueMicrotask(() => pass.end(slice));
       return pass;
     }
     this.readRanged(start, end)
