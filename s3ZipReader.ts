@@ -6,6 +6,23 @@ import yauzl from 'yauzl';
 import { S3Client, HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { PassThrough, Readable } from 'readable-stream';
 
+function readableFromWebStream(webStream: ReadableStream<Uint8Array>): PassThrough {
+  const pass = new PassThrough();
+  const reader = webStream.getReader();
+  (async () => {
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) { pass.end(); break; }
+        pass.write(value);
+      }
+    } catch (err) {
+      pass.destroy(err as Error);
+    }
+  })();
+  return pass;
+}
+
 const NON_SEQUENTIAL_FETCH_CAP = 256 * 1024;
 
 
@@ -146,7 +163,7 @@ class HttpRandomAccessReader extends CachedRandomAccessReader {
     })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status} fetching range ${start}-${end - 1}`);
-        return Readable.fromWeb(res.body as ReadableStream<Uint8Array>);
+        return readableFromWebStream(res.body as ReadableStream<Uint8Array>);
       });
   }
 }
